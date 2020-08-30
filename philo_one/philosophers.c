@@ -1,24 +1,25 @@
 #include "philosophers.h"
 
-#define FORK 0
-#define EATING 1
-#define SLEEPING 2
-#define THINKING 3
-#define FREE 0
-#define TAKEN 1
+long time_eat = 200;
+long time_sleep = 200;
+long time_think = 200;
+long time_to_starve = 410;
 
-void    print_state(t_table *philo, int state)
+/*
+**      The goal is to go for the lowest id_fork first
+*/
+
+
+
+/*
+**      Return timestamp in microseconds
+*/
+
+/*void    print_state(t_table *philo, int state)
 {
     long     ret;
 
-    ret = 0;
-    pthread_mutex_lock(&philo->time->time_lock);
-    gettimeofday(&philo->time->tv, NULL);
-    if (philo->time->tv.tv_usec >= philo->time->start_program)
-        philo->time->timestamp += philo->time->tv.tv_usec - philo->time->start_program;
-    else if (philo->time->tv.tv_usec < philo->time->start_program)
-        philo->time->timestamp += ((MAX_USEC- philo->time->start_program) + philo->time->tv.tv_usec);
-    ret = philo->time->timestamp / 1000;
+    ret = actualize_timestamp(philo) / 1000;
     if (state == FORK)
         printf("%ld %d has taken a fork\n", ret, philo->id);
     else if (state == EATING)
@@ -27,120 +28,94 @@ void    print_state(t_table *philo, int state)
         printf("%ld %d is sleeping\n", ret, philo->id);
     else if (state == THINKING)
         printf("%ld %d is thinking\n", ret, philo->id);
-    philo->time->start_program = philo->time->tv.tv_usec;
-    pthread_mutex_unlock(&philo->time->time_lock);
-}
+}*/
 
-void    philo_eat(t_table *philo, long time, int state)
+void print_state(t_table *philo, int state, int fork_id)
 {
-    long     action_time;
-    long    tmp;
-    struct timeval tv;
+    long ret;
+    char    *buffer;
 
-    print_state(philo, state);
-    gettimeofday(&tv, NULL);
-    tmp = tv.tv_usec;
-    action_time = 0;
-    while (action_time <= time)
+    buffer = malloc(100);
+    ret = actualize_timestamp(philo) / 1000;
+    strcat(buffer, ft_itoa((int)ret));
+    strcat(buffer, " ");
+    strcat(buffer, ft_itoa(philo->id));
+    if (state == FORK)
     {
-        gettimeofday(&tv, NULL);
-        if (tv.tv_usec >= tmp)
-            action_time = tv.tv_usec - tmp;
-        else if (tv.tv_usec < tmp)
-            action_time = ((MAX_USEC - tmp) + tv.tv_usec);
-        action_time /= 1000;
-        usleep(1);
+        strcat(buffer, " has taken a fork number ");
+        strcat(buffer, ft_itoa(fork_id));
+        strcat(buffer, "\n");
     }
+    else if (state == EATING)
+        strcat(buffer, " is eating\n");
+    else if (state == SLEEPING)
+        strcat(buffer, " is sleeping\n");
+    else if (state == THINKING)
+        strcat(buffer, " is thinking\n");
+    write(1, buffer, strlen(buffer));
 }
 
+void    quit_program(t_table *philo)
+{
+    actualize_timestamp(philo);
+    pthread_mutex_lock(&philo->time->time_lock);
+    printf("%ld [%ld-%ld] %d should have died\n", philo->time->timestamp / 1000, philo->time_meal, philo->last_meal, philo->id);
+    philo->last_meal = philo->time->timestamp / 1000;
+    pthread_mutex_unlock(&philo->time->time_lock);
+    //exit(0);
+}
 
 void    philo_action(t_table *philo, long time, int state)
 {
     long     action_time;
     long    tmp;
-    struct timeval tv;
+    long    ret;
 
-    print_state(philo, state);
-    gettimeofday(&tv, NULL);
-    tmp = tv.tv_usec;
+    ret = 0;
     action_time = 0;
+    print_state(philo, state, 0);
+    tmp = actualize_timestamp(philo);
+    if (state == EATING)
+        philo->last_meal = tmp / 1000;
+    philo->time_meal = tmp / 1000;
+    if (philo->time_meal - philo->last_meal > philo->time_to_starve)
+        quit_program(philo);
     while (action_time <= time)
     {
-        gettimeofday(&tv, NULL);
-        if (tv.tv_usec >= tmp)
-            action_time = tv.tv_usec - tmp;
-        else if (tv.tv_usec < tmp)
-            action_time = ((MAX_USEC - tmp) + tv.tv_usec);
+        ret = actualize_timestamp(philo);
+        philo->time_meal = ret / 1000;
+        if (philo->time_meal - philo->last_meal > philo->time_to_starve)
+            quit_program(philo);
+        if (ret >= tmp)
+            action_time = ret - tmp;
+        else if (ret < tmp)
+            action_time = ((MAX_USEC - tmp) + ret);
         action_time /= 1000;
-        usleep(1);
     }
-}
-
-void        take_fork(t_table *philo)
-{
-    int fork;
-
-    fork = 0;
-    while (fork != 2)
-    {
-        pthread_mutex_lock(&philo->prev->r_fork->mtx);
-        if (philo->prev->r_fork->state == FREE)
-        {
-            philo->prev->r_fork->state = TAKEN;
-            fork++;
-            print_state(philo, FORK);
-        }
-        pthread_mutex_unlock(&philo->prev->r_fork->mtx);
-        pthread_mutex_lock(&philo->r_fork->mtx);
-        if (philo->r_fork->state == FREE)
-        {
-            philo->r_fork->state = TAKEN;
-            fork++;
-            print_state(philo, FORK);
-        }
-        pthread_mutex_unlock(&philo->r_fork->mtx);
-    }
-}
-
-void free_fork(t_table *philo)
-{
-    pthread_mutex_lock(&philo->prev->r_fork->mtx);
-    philo->prev->r_fork->state = FREE;
-    pthread_mutex_unlock(&philo->prev->r_fork->mtx);
-    pthread_mutex_lock(&philo->r_fork->mtx);
-    philo->r_fork->state = FREE;
-    pthread_mutex_unlock(&philo->r_fork->mtx);
 }
 
 void *philo_state(void *arg)
 {
-    t_table *philo = arg;
-    int fork;
-    long    last_meal;
-    long    time_meal;
+    t_table *philo;
+    int     count;
 
-    fork = 0;
-    last_meal = 0;
-    time_meal = 0;
-    while (1)
+    philo = arg;
+    philo->last_meal = 0;
+    philo->time_meal = 0;
+    count = -1;
+    while (count <= philo->turn)
     {
-        pthread_mutex_lock(&philo->time->time_lock);
-        time_meal = philo->time->timestamp / 1000;
-        pthread_mutex_unlock(&philo->time->time_lock);
-        if (time_meal - last_meal > philo->time_to_starve)
-        {
-            printf("%d %ld %ld died\n", philo->id, time_meal, last_meal);
-            exit(0);
-        }
         take_fork(philo);
-        philo_eat(philo, philo->time_eat, EATING);
-        pthread_mutex_lock(&philo->time->time_lock);
-        last_meal = philo->time->timestamp / 1000;
-        pthread_mutex_unlock(&philo->time->time_lock);
+        philo_action(philo, philo->time_eat, EATING);
         free_fork(philo);
+        if (philo->turn != 0)
+            count++;
+        if (count == philo->turn)
+            break;
         philo_action(philo, philo->time_sleep, SLEEPING);
         philo_action(philo, philo->time_think, THINKING);
     }
+    return (NULL);
 }
 
 t_table     *set_philosophers(int nb_philosophers)
@@ -175,9 +150,16 @@ t_table     *set_philosophers(int nb_philosophers)
         tmp->time_sleep = time_sleep;
         tmp->time_think = time_think;
         tmp->time_to_starve = time_to_starve;
+        tmp->turn = 0;
         if (!(tmp->r_fork = malloc(sizeof(t_fork))))
             printf("ERROR MALLOC\n");
         tmp->r_fork->state = FREE;
+        tmp->r_fork->id_fork = count;
+        tmp->n_philo = nb_philosophers;
+        if (count % 2 == 0)
+            tmp->use_hand = RIGHT;
+        else
+            tmp->use_hand = LEFT;
         pthread_mutex_init(&tmp->r_fork->mtx, NULL);
         tmp->time = time;
         tmp->next = NULL;
@@ -192,15 +174,20 @@ t_table     *set_philosophers(int nb_philosophers)
 int     main(int ac, char **av)
 {
     t_table *philo;
+    int n_philo = 4;
 
-    int n_philo = 5;
     philo = set_philosophers(n_philo);
+    pthread_mutex_lock(&philo->time->time_lock);
+    gettimeofday(&philo->time->tv, NULL);
+    philo->time->timestamp = 0;
+    philo->time->start_program = philo->time->tv.tv_usec;
+    pthread_mutex_unlock(&philo->time->time_lock);
     while (philo)
     {
         if (pthread_create(&philo->th, NULL, philo_state, philo) == -1)
             printf("ERROR THREAD\n");
         pthread_detach(philo->th);
-        usleep(1);
+        usleep(20);
         philo = philo->next;
     }
     while (1)
