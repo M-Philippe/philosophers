@@ -24,7 +24,7 @@
 typedef struct  s_args
 {
     int     nb_philo;
-    int     time_to_die;
+    int     time_to_starve;
     int     time_to_eat;
     int     time_to_sleep;
     int     n_time_must_eat;
@@ -48,20 +48,18 @@ typedef struct s_fork
 typedef struct s_table
 {
     int         id;
-    //t_fork      *l_fork;
     t_fork      *r_fork;
     pthread_t   th;
     struct s_table     *prev;
     struct s_table     *next;
-    int     time_eat;
-    int     time_sleep;
-    int     time_think;
+    int     time_to_eat;
+    int     time_to_sleep;
     int     time_to_starve;
     long    time_meal;
     long    last_meal;
+    int     nb_philo;
     int     turn;
     int     use_hand;
-    int     n_philo;
     t_time  *time;
 }               t_table;
 
@@ -73,5 +71,6 @@ void    print_state(t_table *philo, int state, int fork_id);
 void    quit_program(t_table *philo);
 char			*ft_itoa(int n);
 void    assign_fork(t_table *philo, t_fork **first, t_fork **second);
+t_args    *parsing(int ac, char **av);
 
 # endif

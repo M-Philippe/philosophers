@@ -20,6 +20,7 @@ COMP	=	philosophers.c\
 			fork.c\
 			timestamp.c\
 			ft_itoa.c\
+			parsing.c\
 
 OBJ	=	$(COMP:.c=.o)
 

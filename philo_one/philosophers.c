@@ -1,35 +1,5 @@
 #include "philosophers.h"
 
-long time_eat = 200;
-long time_sleep = 200;
-long time_think = 200;
-long time_to_starve = 410;
-
-/*
-**      The goal is to go for the lowest id_fork first
-*/
-
-
-
-/*
-**      Return timestamp in microseconds
-*/
-
-/*void    print_state(t_table *philo, int state)
-{
-    long     ret;
-
-    ret = actualize_timestamp(philo) / 1000;
-    if (state == FORK)
-        printf("%ld %d has taken a fork\n", ret, philo->id);
-    else if (state == EATING)
-        printf("%ld %d is eating\n", ret, philo->id);
-    else if (state == SLEEPING)
-        printf("%ld %d is sleeping\n", ret, philo->id);
-    else if (state == THINKING)
-        printf("%ld %d is thinking\n", ret, philo->id);
-}*/
-
 void print_state(t_table *philo, int state, int fork_id)
 {
     long ret;
@@ -59,10 +29,9 @@ void    quit_program(t_table *philo)
 {
     actualize_timestamp(philo);
     pthread_mutex_lock(&philo->time->time_lock);
-    printf("%ld [%ld-%ld] %d should have died\n", philo->time->timestamp / 1000, philo->time_meal, philo->last_meal, philo->id);
-    philo->last_meal = philo->time->timestamp / 1000;
+    printf("%ld [%ld-%ld] %d have died\n", philo->time->timestamp / 1000, philo->time_meal, philo->last_meal, philo->id);
     pthread_mutex_unlock(&philo->time->time_lock);
-    //exit(0);
+    exit(0);
 }
 
 void    philo_action(t_table *philo, long time, int state)
@@ -106,19 +75,19 @@ void *philo_state(void *arg)
     while (count <= philo->turn)
     {
         take_fork(philo);
-        philo_action(philo, philo->time_eat, EATING);
+        philo_action(philo, philo->time_to_eat, EATING);
         free_fork(philo);
         if (philo->turn != 0)
             count++;
         if (count == philo->turn)
             break;
-        philo_action(philo, philo->time_sleep, SLEEPING);
-        philo_action(philo, philo->time_think, THINKING);
+        philo_action(philo, philo->time_to_sleep, SLEEPING);
+        print_state(philo, THINKING, 0);
     }
     return (NULL);
 }
 
-t_table     *set_philosophers(int nb_philosophers)
+t_table     *set_philosophers(t_args *args)
 {
     int     count;
     t_table *head;
@@ -135,7 +104,7 @@ t_table     *set_philosophers(int nb_philosophers)
     time->timestamp = 0;
     time->start_program = time->tv.tv_usec;
     pthread_mutex_init(&time->time_lock, NULL);
-    while (count <= nb_philosophers)
+    while (count <= args->nb_philo)
     {
         tmp = malloc(sizeof(t_table));
         if (link)
@@ -146,16 +115,15 @@ t_table     *set_philosophers(int nb_philosophers)
         if (count == 1)
             head = tmp;
         tmp->id = count;
-        tmp->time_eat = time_eat;
-        tmp->time_sleep = time_sleep;
-        tmp->time_think = time_think;
-        tmp->time_to_starve = time_to_starve;
-        tmp->turn = 0;
+        tmp->time_to_eat = args->time_to_eat;
+        tmp->time_to_sleep = args->time_to_sleep;
+        tmp->time_to_starve = args->time_to_starve;
+        tmp->turn = args->n_time_must_eat;
         if (!(tmp->r_fork = malloc(sizeof(t_fork))))
             printf("ERROR MALLOC\n");
         tmp->r_fork->state = FREE;
         tmp->r_fork->id_fork = count;
-        tmp->n_philo = nb_philosophers;
+        tmp->nb_philo = args->nb_philo;
         if (count % 2 == 0)
             tmp->use_hand = RIGHT;
         else
@@ -174,9 +142,10 @@ t_table     *set_philosophers(int nb_philosophers)
 int     main(int ac, char **av)
 {
     t_table *philo;
-    int n_philo = 4;
+    t_args  *args;
 
-    philo = set_philosophers(n_philo);
+    args = parsing(ac, av);
+    philo = set_philosophers(args);
     pthread_mutex_lock(&philo->time->time_lock);
     gettimeofday(&philo->time->tv, NULL);
     philo->time->timestamp = 0;
@@ -187,35 +156,9 @@ int     main(int ac, char **av)
         if (pthread_create(&philo->th, NULL, philo_state, philo) == -1)
             printf("ERROR THREAD\n");
         pthread_detach(philo->th);
-        usleep(20);
         philo = philo->next;
     }
     while (1)
     {}
     return (0);
 }
-
-/*void    print_value(t_philo *philo)
-{
-    printf("numbers of philo : %d\n", philo->n_philo);
-    printf("time_to_die : %d\n", philo->time_to_die);
-    printf("time to eat : %d\n", philo->time_to_eat);
-    printf("time to sleep : %d\n", philo->time_to_sleep);
-    printf("numbers of time must eat : %d\n", philo->n_time_must_eat);
-    //printf("MAX_THREAD : %d\n", PTHREAD_THREADS_MAX);
-}*/
-
-
-    /*t_philo     philo;
-
-    if (ac <= 4 || ac >= 7)
-        return (0);
-    philo.n_philo = atoi(av[1]);
-    philo.time_to_die = atoi(av[2]);
-    philo.time_to_eat = atoi(av[3]);
-    philo.time_to_sleep = atoi(av[4]);
-    if (av[5])
-        philo.n_time_must_eat = atoi(av[5]);
-    else
-        philo.n_time_must_eat = 0;
-    print_value(&philo);*/
