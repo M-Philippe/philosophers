@@ -11,7 +11,7 @@
 #                                                         /                    #
 # **************************************************************************** #
 
-CFLAGS	= -Wall -Wextra -g3
+CFLAGS	= -Wall -Wextra -g3 #-fsanitize=thread
 
 NAME	=	philo_one
 

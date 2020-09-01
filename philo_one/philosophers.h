@@ -60,6 +60,7 @@ typedef struct s_table
     int     nb_philo;
     int     turn;
     int     use_hand;
+    int     done;
     t_time  *time;
 }               t_table;
 

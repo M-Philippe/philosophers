@@ -47,8 +47,8 @@ void    philo_action(t_table *philo, long time, int state)
 
     ret = 0;
     action_time = 0;
-    print_state(philo, state, 0);
     tmp = actualize_timestamp(philo);
+    print_state(philo, state, 0);
     if (state == EATING)
         philo->last_meal = tmp / 1000;
     philo->time_meal = tmp / 1000;
@@ -68,7 +68,7 @@ void    philo_action(t_table *philo, long time, int state)
     }
 }
 
-void *philo_state(void *arg)
+void *philosophize(void *arg)
 {
     t_table *philo;
     int     count;
@@ -89,6 +89,7 @@ void *philo_state(void *arg)
         philo_action(philo, philo->time_to_sleep, SLEEPING);
         print_state(philo, THINKING, 0);
     }
+    philo->done = 1;
     return (NULL);
 }
 
@@ -158,12 +159,12 @@ int     main(int ac, char **av)
     pthread_mutex_unlock(&philo->time->time_lock);
     while (philo)
     {
-        if (pthread_create(&philo->th, NULL, philo_state, philo) == -1)
+        if (pthread_create(&philo->th, NULL, philosophize, philo) != 0)
             printf("ERROR THREAD\n");
         pthread_detach(philo->th);
-        usleep(50);
         philo = philo->next;
     }
+    /*Put the check of death here*/
     while (1)
     {}
     return (0);
