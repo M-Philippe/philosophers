@@ -10,7 +10,9 @@ void print_state(t_table *philo, int state, int fork_id)
     long ret;
     char    *buffer;
 
-    buffer = malloc(100);
+    if (is_philo_dead(philo, ASK))
+        return ;
+    buffer = memset(malloc(100), '\0', 99);
     ret = actualize_timestamp(philo) / 1000;
     strcat(buffer, ft_itoa((int)ret));
     strcat(buffer, " ");
@@ -30,6 +32,20 @@ void print_state(t_table *philo, int state, int fork_id)
     write(1, buffer, strlen(buffer));
 }
 
+void    print_death(t_table *philo)
+{
+    long ret;
+    char    *buffer;
+
+    buffer = memset(malloc(100), '\0', 99);
+    ret = actualize_timestamp(philo) / 1000;
+    strcat(buffer, ft_itoa((int)ret));
+    strcat(buffer, " ");
+    strcat(buffer, ft_itoa(philo->id));
+    strcat(buffer, " is dead\n");
+    write(1, buffer, strlen(buffer));
+}
+
 void    quit_program(t_table *philo)
 {
     actualize_timestamp(philo);
@@ -45,6 +61,8 @@ void    philo_action(t_table *philo, long time, int state)
     long    tmp;
     long    ret;
 
+    if (is_philo_dead(philo, ASK))
+        return ;
     ret = 0;
     action_time = 0;
     tmp = actualize_timestamp(philo);
@@ -53,19 +71,56 @@ void    philo_action(t_table *philo, long time, int state)
         philo->last_meal = tmp / 1000;
     philo->time_meal = tmp / 1000;
     if (philo->time_meal - philo->last_meal > philo->time_to_starve)
-        quit_program(philo);
+        is_philo_dead(philo, SET);
     while (action_time <= time)
     {
         ret = actualize_timestamp(philo);
         philo->time_meal = ret / 1000;
         if (philo->time_meal - philo->last_meal > philo->time_to_starve)
-            quit_program(philo);
+            is_philo_dead(philo, SET);
         if (ret >= tmp)
             action_time = ret - tmp;
         else if (ret < tmp)
             action_time = ((MAX_USEC - tmp) + ret);
         action_time /= 1000;
     }
+}
+
+int     is_philo_dead(t_table *philo, int flag)
+{
+    int ret;
+
+    ret = 0;
+    pthread_mutex_lock(&philo->monitor->mtx);
+    if (flag == SET && philo->monitor->someone_died != 1)
+    {
+        philo->monitor->someone_died = 1;
+        print_death(philo);
+    }
+    else if (flag == ASK)
+        ret = philo->monitor->someone_died;
+    pthread_mutex_unlock(&philo->monitor->mtx);
+    return (ret);
+}
+
+int     is_philo_done(t_info *monitor, int flag)
+{
+    int ret;
+
+    ret = 0;
+    if (flag == SET)
+    {
+        pthread_mutex_lock(&monitor->mtx);
+        monitor->done++;
+        pthread_mutex_unlock(&monitor->mtx);
+    }
+    else if (flag == ASK)
+    {
+        pthread_mutex_lock(&monitor->mtx);
+        ret = monitor->done;
+        pthread_mutex_unlock(&monitor->mtx);
+    }
+    return (ret);
 }
 
 void *philosophize(void *arg)
@@ -76,24 +131,23 @@ void *philosophize(void *arg)
     philo = arg;
     philo->last_meal = 0;
     philo->time_meal = 0;
-    count = -1;
-    while (count <= philo->turn)
+    count = 0;
+    while (is_philo_dead(philo, ASK) == 0)
     {
         take_fork(philo);
         philo_action(philo, philo->time_to_eat, EATING);
         free_fork(philo);
-        if (philo->turn != 0)
-            count++;
-        if (count == philo->turn)
-            break;
+        count++;
+        if (count == philo->turns)
+            break ;
         philo_action(philo, philo->time_to_sleep, SLEEPING);
         print_state(philo, THINKING, 0);
     }
-    philo->done = 1;
+    is_philo_done(philo->monitor, SET);
     return (NULL);
 }
 
-t_table     *set_philosophers(t_args *args)
+t_table     *set_philosophers(t_args *args, t_info *monitor)
 {
     int     count;
     t_table *head;
@@ -124,16 +178,15 @@ t_table     *set_philosophers(t_args *args)
         tmp->time_to_eat = args->time_to_eat;
         tmp->time_to_sleep = args->time_to_sleep;
         tmp->time_to_starve = args->time_to_starve;
-        tmp->turn = args->n_time_must_eat;
+        tmp->turns = args->n_time_must_eat;
+        tmp->monitor = monitor;
+        if (tmp->turns == 0)
+            tmp->turns = -1;
         if (!(tmp->r_fork = malloc(sizeof(t_fork))))
             printf("ERROR MALLOC\n");
         tmp->r_fork->state = FREE;
         tmp->r_fork->id_fork = count;
         tmp->nb_philo = args->nb_philo;
-        if (count % 2 == 0)
-            tmp->use_hand = RIGHT;
-        else
-            tmp->use_hand = LEFT;
         pthread_mutex_init(&tmp->r_fork->mtx, NULL);
         tmp->time = time;
         tmp->next = NULL;
@@ -149,9 +202,15 @@ int     main(int ac, char **av)
 {
     t_table *philo;
     t_args  *args;
+    t_info  *monitor;
 
     args = parsing(ac, av);
-    philo = set_philosophers(args);
+    if (!(monitor = malloc(sizeof(t_info))))
+        printf("Error malloc\n");
+    monitor->done = 0;
+    monitor->someone_died = 0;
+    pthread_mutex_init(&monitor->mtx, NULL);
+    philo = set_philosophers(args, monitor);
     pthread_mutex_lock(&philo->time->time_lock);
     gettimeofday(&philo->time->tv, NULL);
     philo->time->timestamp = 0;
@@ -165,7 +224,11 @@ int     main(int ac, char **av)
         philo = philo->next;
     }
     /*Put the check of death here*/
-    while (1)
-    {}
+    while (is_philo_done(monitor, ASK) != args->nb_philo)
+    {
+        /* FREE */
+        usleep(10);
+    }
+    printf("#######################################\n");
     return (0);
 }

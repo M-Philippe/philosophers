@@ -20,6 +20,8 @@
 #define TAKEN 1
 #define LEFT 0
 #define RIGHT 1
+#define SET 0
+#define ASK 1
 
 typedef struct  s_args
 {
@@ -45,6 +47,13 @@ typedef struct s_fork
     pthread_mutex_t mtx;
 }               t_fork;
 
+typedef struct s_info
+{
+    int     done;
+    int     someone_died;
+    pthread_mutex_t mtx;
+}               t_info;
+
 typedef struct s_table
 {
     int         id;
@@ -52,15 +61,15 @@ typedef struct s_table
     pthread_t   th;
     struct s_table     *prev;
     struct s_table     *next;
+    t_info  *monitor;
     int     time_to_eat;
     int     time_to_sleep;
     int     time_to_starve;
     long    time_meal;
     long    last_meal;
     int     nb_philo;
-    int     turn;
+    int     turns;
     int     use_hand;
-    int     done;
     t_time  *time;
 }               t_table;
 
@@ -73,5 +82,8 @@ void    quit_program(t_table *philo);
 char			*ft_itoa(int n);
 void    assign_fork(t_table *philo, t_fork **first, t_fork **second);
 t_args    *parsing(int ac, char **av);
+
+int     is_philo_dead(t_table *philo, int flag);
+int     is_philo_done(t_info *monitor, int flag);
 
 # endif
