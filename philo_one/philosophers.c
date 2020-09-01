@@ -1,5 +1,10 @@
 #include "philosophers.h"
 
+
+/*
+**      only take the fork by pair -> Doesn't work
+*/
+
 void print_state(t_table *philo, int state, int fork_id)
 {
     long ret;
@@ -156,6 +161,7 @@ int     main(int ac, char **av)
         if (pthread_create(&philo->th, NULL, philo_state, philo) == -1)
             printf("ERROR THREAD\n");
         pthread_detach(philo->th);
+        usleep(50);
         philo = philo->next;
     }
     while (1)
