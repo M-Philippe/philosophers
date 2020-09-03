@@ -40,13 +40,6 @@ typedef struct s_time
 	pthread_mutex_t time_lock;
 }               t_time;
 
-typedef struct s_fork
-{
-	int     state;
-	int     id_fork;
-	pthread_mutex_t mtx;
-}               t_fork;
-
 typedef struct s_info
 {
 	int     done;
@@ -54,14 +47,33 @@ typedef struct s_info
 	pthread_mutex_t mtx;
 }               t_info;
 
+typedef struct s_write
+{
+	pthread_mutex_t	writing;
+}		t_write;
+
+typedef struct s_fork
+{
+	pthread_mutex_t	fork;
+}		t_fork;
+
+typedef struct s_monitor
+{
+	long	last_meal;
+	int	id;
+	pthread_mutex_t	mtx;
+}		t_monitor;
+
 typedef struct s_table
 {
 	int         id;
-	t_fork      *r_fork;
+	t_fork	*r_fork;
+	t_write	*write;
 	pthread_t   th;
 	struct s_table     *prev;
 	struct s_table     *next;
-	t_info  *monitor;
+	t_monitor	*monitor;
+	long	start_program;
 	int     time_to_eat;
 	int     time_to_sleep;
 	int     time_to_starve;
@@ -73,17 +85,15 @@ typedef struct s_table
 	t_time  *time;
 }               t_table;
 
-void banker_algorithm(t_table *philo);
 void        take_fork(t_table *philo);
 void free_fork(t_table *philo);
-long    actualize_timestamp(t_table *philo);
-void    print_state(t_table *philo, int state, int fork_id);
-void    quit_program(t_table *philo);
-char			*ft_itoa(int n);
-void    assign_fork(t_table *philo, t_fork **first, t_fork **second);
 t_args    *parsing(int ac, char **av);
+t_time *set_time(void);
+t_table *set_philosophers(t_args *args, t_monitor **mtr);
 
 int     is_philo_dead(t_table *philo, int flag);
 int     is_philo_done(t_info *monitor, int flag);
+void ft_putnbr_fd(int n, int fd);
+
 
 # endif
