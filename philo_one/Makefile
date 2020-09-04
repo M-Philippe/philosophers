@@ -23,6 +23,8 @@ COMP	=	$(SRCS_D)philosophers.c\
 			$(SRCS_D)ft_itoa.c\
 			$(SRCS_D)ft_putnbr_fd.c\
 			$(SRCS_D)parsing.c\
+			$(SRCS_D)monitor.c\
+			$(SRCS_D)print.c\
 
 OBJ	=	$(COMP:.c=.o)
 

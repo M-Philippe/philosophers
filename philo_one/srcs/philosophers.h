@@ -101,6 +101,22 @@ void ft_putnbr_fd(int n, int fd);
 int	is_someone_dead(t_table *philo);
 int	is_dead(t_table *philo);
 
+// MONITOR.C
+void	*monitoring(void *arg);
+int	is_dead(t_table *philo);
+int	philosophers_done(t_monitor *mtr, int flag);
+int	is_someone_dead(t_table *philo);
+
+// PRINT.C
+void	print_state(t_table *philo, int id, int state);
+void	print_death(int id, long t_stamp);
+
+
+long	timestamp(t_table *philo);
+void	action(t_table *philo, long time,  int state);
+void	free_all(t_table *philo);
+
+
 
 
 # endif
