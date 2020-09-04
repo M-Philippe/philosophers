@@ -14,7 +14,7 @@ t_time *set_time(void)
 	return (time);
 }
 
-t_table *set_philosophers(t_args *args, t_monitor **mtr)
+t_table *set_philosophers(t_args *args, t_monitor *mtr)
 {
 	int	count;
 	t_table	*head;
@@ -22,18 +22,12 @@ t_table *set_philosophers(t_args *args, t_monitor **mtr)
 	t_table	*philo;
 	t_time	*time;
 	t_write *write;
-	t_monitor	*monitor[args->nb_philo];
 
 	count = 1;
 	head = NULL;
 	tmp = NULL;
 	philo = NULL;
 	time = set_time();
-	for (int i = 0; i < args->nb_philo; i++)
-	{
-		if (!(monitor[i] = malloc(sizeof(t_monitor))))
-			printf("Error malloc monitor\n");
-	}
 	if (!(write = malloc(sizeof(t_write))))
 		printf("Error malloc write\n");
 	pthread_mutex_init(&write->writing, NULL);
@@ -55,10 +49,9 @@ t_table *set_philosophers(t_args *args, t_monitor **mtr)
 		philo->time_to_starve = args->time_to_starve;
 		philo->turns = args->n_time_must_eat;
 		philo->start_program = time->start_program;
-		printf("%ld\n", philo->start_program);
-		//philo->monitor = monitor;
-		philo->monitor = monitor[count-1];
-		monitor[count-1]->id = count;
+		// MONITOR
+		philo->monitor = mtr;
+		//set_monitor(philo, tmp, count);
 		philo->write = write;
 		if (philo->turns == 0)
 			philo->turns = -1;
@@ -73,6 +66,6 @@ t_table *set_philosophers(t_args *args, t_monitor **mtr)
 	}
 	tmp->next = head;
 	head->prev = tmp;
-	mtr = &monitor[0];
+	//mtr = head->monitor;
 	return (head);
 }

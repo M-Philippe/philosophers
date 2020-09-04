@@ -44,25 +44,69 @@ void	action(t_table *philo, long time,  int state)
 void	*philosophize(void *arg)
 {
 	t_table *philo;
+	int	count;
 
 	philo = arg;
 	long	time_meal = 0;
 	long last_meal = philo->start_program;
+	count = 0;
 	while (1)
 	{
 		time_meal = (timestamp(philo) - philo->start_program) - last_meal;
 		if (time_meal > philo->time_to_starve)
 		{
+			pthread_mutex_lock(&philo->write->writing);
 			printf("%ld %d Died\n", timestamp(philo) - philo->start_program,philo->id);
-			exit(0);
+		exit(0);
 		}
 		take_fork(philo);
 		last_meal = timestamp(philo) - philo->start_program;
 		action(philo, philo->time_to_eat, EATING);
+		count++;
+		if (count == philo->turns)
+			break ;
 		free_fork(philo);
 		action(philo, philo->time_to_sleep, SLEEPING);
 		print_state(philo, philo->id, THINKING);
 	}
+	philosophers_done(philo->monitor, SET);
+	return (NULL);
+}
+
+int	philosophers_done(t_monitor *mtr, int flag)
+{
+	int	ret;
+
+	ret = 0;
+	if (flag == SET)
+	{
+		pthread_mutex_lock(&mtr->mtx);
+		mtr->done++;
+		pthread_mutex_unlock(&mtr->mtx);
+	}
+	else if (flag == ASK)
+	{
+		pthread_mutex_lock(&mtr->mtx);
+		ret = mtr->done;
+		pthread_mutex_unlock(&mtr->mtx);
+	}
+	return (ret);
+}
+
+void	*monitoring(void *arg)
+{
+	t_monitor	*monitor;
+	int		nb_philo;
+
+	monitor = arg;
+	pthread_mutex_lock(&monitor->mtx);
+	nb_philo = monitor->nb_philo;
+	pthread_mutex_unlock(&monitor->mtx);
+	while (philosophers_done(monitor, ASK) != nb_philo)
+	{
+		usleep(1 * 100000);
+	}
+	printf("##############\n");
 	return (NULL);
 }
 
@@ -72,8 +116,21 @@ int main(int ac, char **av)
 	t_table	*philo;
 	t_monitor	*monitor;
 
+	monitor = NULL;
+	monitor = malloc(sizeof(t_monitor));
+	monitor->someone_died = 0;
+	monitor->done = 0;
+	pthread_mutex_init(&monitor->mtx, NULL);
 	args = parsing(ac, av);
-	philo = set_philosophers(args, &monitor);
+	philo = set_philosophers(args, monitor);
+	/*for (int i = 0; i <= args->nb_philo; i++)
+	{
+		printf("%d\n", philo->monitor->done);
+		philo->monitor->done++;
+		philo = philo->next;
+	}
+	exit(0);*/
+	monitor->nb_philo = args->nb_philo;
 	for (int i = 1; i <= args->nb_philo; i++)
 	{
 		if (pthread_create(&philo->th, NULL, philosophize, philo) != 0)
@@ -83,7 +140,9 @@ int main(int ac, char **av)
 	}
 	//pthread_t	*monitoring;
 	//pthread_create(monitor
-	while(1);
-	//printf("Everything is Finished\n");
+	//while (1);
+	pthread_t	mtr;
+	pthread_create(&mtr, NULL, monitoring, monitor);
+	pthread_join(mtr, NULL);
 	return (0);
 }

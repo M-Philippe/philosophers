@@ -40,13 +40,6 @@ typedef struct s_time
 	pthread_mutex_t time_lock;
 }               t_time;
 
-typedef struct s_info
-{
-	int     done;
-	int     someone_died;
-	pthread_mutex_t mtx;
-}               t_info;
-
 typedef struct s_write
 {
 	pthread_mutex_t	writing;
@@ -57,10 +50,19 @@ typedef struct s_fork
 	pthread_mutex_t	fork;
 }		t_fork;
 
+typedef struct	s_info
+{
+	int		done;
+	unsigned long	last_meal;
+	unsigned long	time_meal;
+	pthread_mutex_t	mtx;
+}		t_info;
+
 typedef struct s_monitor
 {
-	long	last_meal;
-	int	id;
+	int	someone_died;
+	int	done;
+	int	nb_philo;
 	pthread_mutex_t	mtx;
 }		t_monitor;
 
@@ -89,10 +91,8 @@ void        take_fork(t_table *philo);
 void free_fork(t_table *philo);
 t_args    *parsing(int ac, char **av);
 t_time *set_time(void);
-t_table *set_philosophers(t_args *args, t_monitor **mtr);
-
-int     is_philo_dead(t_table *philo, int flag);
-int     is_philo_done(t_info *monitor, int flag);
+t_table *set_philosophers(t_args *args, t_monitor *mtr);
+int	philosophers_done(t_monitor *mtr, int flag);
 void ft_putnbr_fd(int n, int fd);
 
 

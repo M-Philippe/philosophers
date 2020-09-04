@@ -11,7 +11,7 @@
 #                                                         /                    #
 # **************************************************************************** #
 
-CFLAGS	= -Wall -Wextra -g3 #-fsanitize=thread
+CFLAGS	= -Wall -Wextra -g3 #-fsanitize=address
 
 NAME	=	philo_one
 
