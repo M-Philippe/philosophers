@@ -28,6 +28,6 @@ t_args    *parsing(int ac, char **av)
 		args->n_time_must_eat = atoi(av[5]);
 	else
 		args->n_time_must_eat = 0;
-	print_value(args);
+	//print_value(args);
 	return (args);
 }

@@ -52,9 +52,10 @@ typedef struct s_fork
 
 typedef struct	s_info
 {
-	int		done;
-	unsigned long	last_meal;
-	unsigned long	time_meal;
+	long	last_meal;
+	long	time_meal;
+	long	time_to_starve;
+	long	start_program;
 	pthread_mutex_t	mtx;
 }		t_info;
 
@@ -63,6 +64,7 @@ typedef struct s_monitor
 	int	someone_died;
 	int	done;
 	int	nb_philo;
+	struct s_table	*head;
 	pthread_mutex_t	mtx;
 }		t_monitor;
 
@@ -71,6 +73,7 @@ typedef struct s_table
 	int         id;
 	t_fork	*r_fork;
 	t_write	*write;
+	t_info	*meal;
 	pthread_t   th;
 	struct s_table     *prev;
 	struct s_table     *next;
@@ -94,6 +97,10 @@ t_time *set_time(void);
 t_table *set_philosophers(t_args *args, t_monitor *mtr);
 int	philosophers_done(t_monitor *mtr, int flag);
 void ft_putnbr_fd(int n, int fd);
+
+int	is_someone_dead(t_table *philo);
+int	is_dead(t_table *philo);
+
 
 
 # endif

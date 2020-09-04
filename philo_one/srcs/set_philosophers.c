@@ -49,8 +49,15 @@ t_table *set_philosophers(t_args *args, t_monitor *mtr)
 		philo->time_to_starve = args->time_to_starve;
 		philo->turns = args->n_time_must_eat;
 		philo->start_program = time->start_program;
-		// MONITOR
+	// MONITOR
 		philo->monitor = mtr;
+		// Meal
+		philo->meal = malloc(sizeof(t_info));
+		pthread_mutex_init(&philo->meal->mtx, NULL);
+		philo->meal->last_meal = 0;
+		philo->meal->time_meal = 0;
+		philo->meal->start_program = philo->start_program;
+		philo->meal->time_to_starve = philo->time_to_starve;
 		//set_monitor(philo, tmp, count);
 		philo->write = write;
 		if (philo->turns == 0)
