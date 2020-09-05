@@ -13,7 +13,7 @@
 
 #include <unistd.h>
 
-void	ft_putnbr_fd(int n, int fd)
+void	ft_putnbr_fd(long n, int fd)
 {
 	char c;
 

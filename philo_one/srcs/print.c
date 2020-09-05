@@ -8,7 +8,7 @@ void	print_state(t_table *philo, int id, int state)
 		pthread_mutex_unlock(&philo->write->writing);
 		return ;
 	}
-	ft_putnbr_fd((int)(timestamp(philo) - philo->start_program), 1);
+	ft_putnbr_fd((timestamp() - philo->start_program), 1);
 	write(1, " ", 1);
 	ft_putnbr_fd(id, 1);
 	if (state == FORK)
@@ -24,7 +24,7 @@ void	print_state(t_table *philo, int id, int state)
 
 void	print_death(int id, long t_stamp)
 {
-	ft_putnbr_fd((int)t_stamp, 1);
+	ft_putnbr_fd(t_stamp, 1);
 	write(1, " ", 1);
 	ft_putnbr_fd(id, 1);
 	write(1, " is dead\n", 9);

@@ -112,7 +112,7 @@ void	print_state(t_table *philo, int id, int state);
 void	print_death(int id, long t_stamp);
 
 
-long	timestamp(t_table *philo);
+long	timestamp(void);
 void	action(t_table *philo, long time,  int state);
 void	free_all(t_table *philo);
 

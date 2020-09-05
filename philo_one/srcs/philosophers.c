@@ -1,6 +1,6 @@
 #include "philosophers.h"
 
-long	timestamp(t_table *philo)
+long	timestamp(void)
 {
 	long		ret;
 	struct timeval	tv;
@@ -13,12 +13,7 @@ long	timestamp(t_table *philo)
 
 void	action(t_table *philo, long time,  int state)
 {
-	long	action_time;
-	long	start;
-
 	print_state(philo, philo->id, state);
-	start = timestamp(philo) - philo->start_program;
-	action_time = 0;
 	usleep(time * 1000);
 }
 
@@ -38,17 +33,16 @@ void	*philosophize(void *arg)
 		if (is_someone_dead(philo) == 1)
 			break ;
 		pthread_mutex_lock(&philo->meal->mtx);
-		philo->meal->time_meal = (timestamp(philo) - philo->meal->start_program) - philo->meal->last_meal;
+		philo->meal->time_meal = (timestamp() - philo->meal->start_program) - philo->meal->last_meal;
 		if (philo->meal->time_meal > philo->meal->time_to_starve)
 		{
-			printf("%ld %ld\n", philo->meal->time_meal, philo->meal->last_meal);
 			pthread_mutex_unlock(&philo->meal->mtx);
 			break ;
 		}
 		pthread_mutex_unlock(&philo->meal->mtx);
 		take_fork(philo);
 		pthread_mutex_lock(&philo->meal->mtx);
-		philo->meal->last_meal = timestamp(philo) - philo->start_program;
+		philo->meal->last_meal = timestamp() - philo->start_program;
 		philo->meal->time_meal = 0;
 		pthread_mutex_unlock(&philo->meal->mtx);
 		action(philo, philo->time_to_eat, EATING);

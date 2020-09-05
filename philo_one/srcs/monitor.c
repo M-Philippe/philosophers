@@ -39,7 +39,7 @@ int	is_dead(t_table *philo)
 	ret = 0;
 	pthread_mutex_lock(&philo->meal->mtx);
 	pthread_mutex_lock(&philo->monitor->mtx);
-	t_stamp = timestamp(NULL);
+	t_stamp = timestamp();
 	philo->meal->time_meal = (t_stamp - philo->meal->start_program) - philo->meal->last_meal;
 	if (philo->meal->time_meal > philo->meal->time_to_starve && philo->monitor->someone_died == 0)
 	{
@@ -58,25 +58,28 @@ void	*monitoring(void *arg)
 	int		nb_philo;
 	int		ret;
 	t_table		*philo;
+	int		dead;
+	int		i;
 
 	monitor = arg;
 	philo = monitor->head;
 	pthread_mutex_lock(&monitor->mtx);
 	nb_philo = monitor->nb_philo;
 	pthread_mutex_unlock(&monitor->mtx);
-	int dead = 0;
+	dead = 0;
+	ret = 0;
+	i = 0;
 	while (ret != nb_philo)
 	{	if (dead == 0)
 		{
-			for (int i = 1; i < nb_philo; i++)
+			while (i < nb_philo)
 			{
 				if (is_dead(philo) == 1)
-				{
 					dead = 1;
-					break;
-				}
 				philo = philo->next;
+				i++;
 			}
+			i = 0;
 		}
 		ret = philosophers_done(monitor, ASK);
 		usleep(100);
