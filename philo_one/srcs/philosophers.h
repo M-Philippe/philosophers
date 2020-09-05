@@ -117,6 +117,6 @@ void	action(t_table *philo, long time,  int state);
 void	free_all(t_table *philo);
 
 
-
+unsigned int	ft_strlen(char *s);
 
 # endif

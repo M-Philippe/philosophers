@@ -83,6 +83,29 @@ void	free_all(t_table *philo)
 	}
 }
 
+void	start_philosophers(t_args *args, t_table *philo)
+{
+	int i;
+
+	i = 0;
+	while (i < args->nb_philo)
+	{
+		if (pthread_create(&philo->th, NULL, philosophize, philo) != 0)
+			printf("Error Thread\n");
+		pthread_detach(philo->th);
+		philo = philo->next;
+		i++;
+	}
+}
+
+void	start_monitoring(t_monitor *monitor)
+{
+	pthread_t	mtr;
+
+	pthread_create(&mtr, NULL, monitoring, (void*)monitor);
+	pthread_join(mtr, NULL);
+}
+
 int main(int ac, char **av)
 {
 	t_args	*args;
@@ -90,25 +113,30 @@ int main(int ac, char **av)
 	t_monitor	*monitor;
 
 	monitor = NULL;
-	// PROTECT MALLOC
-	monitor = malloc(sizeof(t_monitor));
+	args = NULL;
+	philo = NULL;
+	args = parsing(ac, av);
+	if (!args)
+		return (0);
+	if (!(monitor = malloc(sizeof(t_monitor))))
+	{
+		free(args);
+		return (0);
+	}
 	monitor->someone_died = 0;
 	monitor->done = 0;
 	pthread_mutex_init(&monitor->mtx, NULL);
-	args = parsing(ac, av);
 	philo = set_philosophers(args, monitor);
+	if (!philo)
+	{
+		free(args);
+		free(philo);
+		return (0);
+	}
 	monitor->nb_philo = args->nb_philo;
 	monitor->head = philo;
-	for (int i = 1; i <= args->nb_philo; i++)
-	{
-		if (pthread_create(&philo->th, NULL, philosophize, philo) != 0)
-			printf("Error Thread\n");
-		pthread_detach(philo->th);
-		philo = philo->next;
-	}
-	pthread_t	mtr;
-	pthread_create(&mtr, NULL, monitoring, (void*)monitor);
-	pthread_join(mtr, NULL);
+	start_philosophers(args, philo);
+	start_monitoring(monitor);
 	pthread_mutex_destroy(&monitor->mtx);
 	free(monitor);
 	free(args);

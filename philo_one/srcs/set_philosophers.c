@@ -6,10 +6,9 @@ t_time *set_time(void)
 	struct timeval	tv;
 
 	if (!(time = malloc(sizeof(t_time))))
-		printf("Error malloc time\n");
+		return (NULL);
 	pthread_mutex_init(&time->time_lock, NULL);
 	gettimeofday(&tv, NULL);
-	// Check here
 	time->start_program = (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 	return (time);
 }
@@ -29,7 +28,7 @@ t_table *set_philosophers(t_args *args, t_monitor *mtr)
 	philo = NULL;
 	time = set_time();
 	if (!(write = malloc(sizeof(t_write))))
-		printf("Error malloc write\n");
+		return (NULL);
 	pthread_mutex_init(&write->writing, NULL);
 	while (count <= args->nb_philo)
 	{
@@ -49,7 +48,6 @@ t_table *set_philosophers(t_args *args, t_monitor *mtr)
 		philo->time_to_starve = args->time_to_starve;
 		philo->turns = args->n_time_must_eat;
 		philo->start_program = time->start_program;
-	// MONITOR
 		philo->monitor = mtr;
 		// Meal
 		philo->meal = malloc(sizeof(t_info));
