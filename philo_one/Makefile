@@ -11,7 +11,7 @@
 #                                                         /                    #
 # **************************************************************************** #
 
-CFLAGS	= -Wall -Wextra -Werror -g3 -fsanitize=leak
+CFLAGS	= -Wall -Wextra -Werror -g3 -fsanitize=address
 
 NAME	=	philo_one
 

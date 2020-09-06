@@ -7,7 +7,6 @@ void    print_value(t_args *philo)
 	printf("time to eat : %d\n", philo->time_to_eat);
 	printf("time to sleep : %d\n", philo->time_to_sleep);
 	printf("numbers of time must eat : %d\n", philo->n_time_must_eat);
-	//printf("MAX_THREAD : %d\n", PTHREAD_THREADS_MAX);
 }
 
 int	ft_is_number(char *s)

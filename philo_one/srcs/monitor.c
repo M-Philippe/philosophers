@@ -52,6 +52,21 @@ int	is_dead(t_table *philo)
 	return (ret);
 }
 
+int	checking_death(t_table *philo, int nb_philo)
+{
+	int	i;
+
+	i = 0;
+	while (i < nb_philo)
+	{
+		if (is_dead(philo))
+			return (1);
+		philo = philo->next;
+		i++;
+	}
+	return (0);
+}
+
 void	*monitoring(void *arg)
 {
 	t_monitor	*monitor;
@@ -59,7 +74,6 @@ void	*monitoring(void *arg)
 	int		ret;
 	t_table		*philo;
 	int		dead;
-	int		i;
 
 	monitor = arg;
 	philo = monitor->head;
@@ -68,19 +82,9 @@ void	*monitoring(void *arg)
 	pthread_mutex_unlock(&monitor->mtx);
 	dead = 0;
 	ret = 0;
-	i = 0;
 	while (ret != nb_philo)
 	{	if (dead == 0)
-		{
-			while (i < nb_philo)
-			{
-				if (is_dead(philo) == 1)
-					dead = 1;
-				philo = philo->next;
-				i++;
-			}
-			i = 0;
-		}
+			dead = checking_death(philo, nb_philo);
 		ret = philosophers_done(monitor, ASK);
 		usleep(100);
 	}
