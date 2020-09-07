@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/07 17:15:18 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/08 00:04:47 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <unistd.h>
-# include <string.h>
 
 # define FORK 0
 # define EATING 1
@@ -39,14 +38,6 @@ typedef	struct	s_args
 	int		time_to_sleep;
 	int		n_time_must_eat;
 }				t_args;
-
-typedef struct	s_time
-{
-	long			start_program;
-	long			timestamp;
-	struct timeval	tv;
-	pthread_mutex_t	time_lock;
-}				t_time;
 
 typedef struct	s_write
 {
@@ -95,20 +86,18 @@ typedef struct	s_table
 	int				nb_philo;
 	int				turns;
 	int				use_hand;
-	t_time			*time;
 }				t_table;
 
 void			take_fork(t_table *philo);
 void			free_fork(t_table *philo);
 t_args			*parsing(int ac, char **av);
-t_time			*set_time(void);
 t_table			*set_philosophers(t_args *args, t_monitor *mtr);
 int				philosophers_done(t_monitor *mtr, int flag);
 void			ft_putnbr_fd(int n, int fd);
 /*
 **	SET_PHILOSOPHERS2.C
 */
-t_time			*set_time(void);
+long			set_time(void);
 t_info			*set_meal(long start_program, long time_to_starve);
 void			copy_args(t_table *philo, t_args *args,
 	int count, long start_program);
@@ -138,5 +127,7 @@ long			timestamp(void);
 void			action(t_table *philo, long time, int state);
 void			free_all(t_table *philo);
 unsigned int	ft_strlen(char *s);
+void			*philosophize(void *arg);
+int				ft_atoi(char *s);
 
 #endif

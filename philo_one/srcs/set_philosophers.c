@@ -6,15 +6,14 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:26 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/07 17:15:27 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/08 00:04:58 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int				swap2(t_table *philo, t_table **tmp, t_time *time)
+int				swap2(t_table *philo, t_table **tmp)
 {
-	philo->time = time;
 	philo->next = NULL;
 	*tmp = philo;
 	philo = philo->next;
@@ -40,28 +39,26 @@ int				meal_and_fork(t_table *philo, t_write *write)
 t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
 	t_write *write, int count)
 {
-	t_time	*time;
+	long	start_program;
 	t_table	*philo;
 	t_table	*head;
 	t_table	*tmp;
 
-	time = NULL;
 	tmp = NULL;
 	philo = NULL;
 	head = NULL;
-	if (!(time = set_time()))
-		return (NULL);
+	start_program = timestamp();
 	while (count <= args->nb_philo)
 	{
 		if (!(philo = malloc(sizeof(t_table))))
 			return (NULL);
 		(tmp) ? swap1(tmp, philo) : 0;
 		(count == 1) ? (head = philo) : 0;
-		copy_args(philo, args, count, time->start_program);
+		copy_args(philo, args, count, start_program);
 		philo->monitor = mtr;
 		if (meal_and_fork(philo, write))
 			return (NULL);
-		count += swap2(philo, &tmp, time);
+		count += swap2(philo, &tmp);
 	}
 	last_swap(tmp, head);
 	return (head);

@@ -6,24 +6,11 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 20:04:49 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/07 20:04:50 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/08 00:05:01 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-t_time			*set_time(void)
-{
-	t_time			*time;
-	struct timeval	tv;
-
-	if (!(time = malloc(sizeof(t_time))))
-		return (NULL);
-	pthread_mutex_init(&time->time_lock, NULL);
-	gettimeofday(&tv, NULL);
-	time->start_program = (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-	return (time);
-}
 
 t_info			*set_meal(long start_program, long time_to_starve)
 {

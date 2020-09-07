@@ -1,15 +1,15 @@
 # **************************************************************************** #
-#                                                           LE - /             #
-#                                                               /              #
-#    Makefile                                         .::    .:/ .      .::    #
-#                                                  +:+:+   +:    +:  +:+:+     #
-#    By: pminne <pminne@student.le-101.fr>          +:+   +:    +:    +:+      #
-#                                                  #+#   #+    #+    #+#       #
-#    Created: 2019/10/23 02:26:02 by pminne       #+#   ##    ##    #+#        #
-#    Updated: 2019/12/20 05:48:49 by pminne      ###    #+. /#+    ###.fr      #
-#                                                          /                   #
-#                                                         /                    #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
+#    Updated: 2020/09/08 00:05:13 by pminne           ###   ########lyon.fr    #
+#                                                                              #
 # **************************************************************************** #
+
 
 CFLAGS	= -Wall -Wextra -Werror -g3 #-fsanitize=address
 
@@ -17,11 +17,12 @@ NAME	=	philo_one
 
 SRCS_D = ./srcs/
 
-COMP	=	$(SRCS_D)philosophers.c\
+COMP	=	$(SRCS_D)main.c\
+			$(SRCS_D)philosophize.c\
 			$(SRCS_D)set_philosophers.c\
 			$(SRCS_D)set_philosophers2.c\
 			$(SRCS_D)fork.c\
-			$(SRCS_D)ft_putnbr_fd.c\
+			$(SRCS_D)utils.c\
 			$(SRCS_D)parsing.c\
 			$(SRCS_D)monitor.c\
 			$(SRCS_D)print.c\

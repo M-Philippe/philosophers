@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:11 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/07 17:15:12 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/08 00:04:43 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,57 +19,6 @@ void			print_value(t_args *philo)
 	printf("time to eat : %d\n", philo->time_to_eat);
 	printf("time to sleep : %d\n", philo->time_to_sleep);
 	printf("numbers of time must eat : %d\n", philo->n_time_must_eat);
-}
-
-int				ft_is_number(char *s)
-{
-	int i;
-
-	i = 0;
-	while (s[i])
-	{
-		if (s[i] < '0' && s[i] > '9')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-int				ft_atoi(char *s)
-{
-	int	neg;
-	int	nb;
-	int	i;
-
-	nb = 0;
-	neg = 1;
-	i = 0;
-	while (s[i] == '-' || s[i] == '+')
-	{
-		if (s[i] == '-')
-			neg *= -1;
-		i++;
-	}
-	if (neg == -1)
-		return (-1);
-	if (ft_is_number(&s[i]))
-		return (-1);
-	while (s[i])
-	{
-		nb = (nb * 10) + s[i] - 48;
-		i++;
-	}
-	return (nb == 0 ? -1 : nb);
-}
-
-unsigned int	ft_strlen(char *s)
-{
-	int i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
 }
 
 static void		*perror_parsing(char *msg_error, t_args *args)
