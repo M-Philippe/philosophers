@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/09/07 17:15:07 by pminne            #+#    #+#             */
+/*   Updated: 2020/09/07 17:15:09 by pminne           ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
-int	is_someone_dead(t_table *philo)
+int		is_someone_dead(t_table *philo)
 {
 	int ret;
 
@@ -11,7 +23,7 @@ int	is_someone_dead(t_table *philo)
 	return (ret);
 }
 
-int	philosophers_done(t_monitor *mtr, int flag)
+int		philosophers_done(t_monitor *mtr, int flag)
 {
 	int	ret;
 
@@ -31,17 +43,19 @@ int	philosophers_done(t_monitor *mtr, int flag)
 	return (ret);
 }
 
-int	is_dead(t_table *philo)
+int		is_dead(t_table *philo)
 {
 	long	t_stamp;
-	int	ret;
+	int		ret;
 
 	ret = 0;
 	pthread_mutex_lock(&philo->meal->mtx);
 	pthread_mutex_lock(&philo->monitor->mtx);
 	t_stamp = timestamp();
-	philo->meal->time_meal = (t_stamp - philo->meal->start_program) - philo->meal->last_meal;
-	if (philo->meal->time_meal > philo->meal->time_to_starve && philo->monitor->someone_died == 0)
+	philo->meal->time_meal = (t_stamp - philo->meal->start_program)
+		- philo->meal->last_meal;
+	if (philo->meal->time_meal > philo->meal->time_to_starve
+		&& philo->monitor->someone_died == 0)
 	{
 		philo->monitor->someone_died = 1;
 		ret = 1;
@@ -52,7 +66,7 @@ int	is_dead(t_table *philo)
 	return (ret);
 }
 
-int	checking_death(t_table *philo, int nb_philo)
+int		checking_death(t_table *philo, int nb_philo)
 {
 	int	i;
 
@@ -69,11 +83,11 @@ int	checking_death(t_table *philo, int nb_philo)
 
 void	*monitoring(void *arg)
 {
-	t_monitor	*monitor;
-	int		nb_philo;
-	int		ret;
-	t_table		*philo;
-	int		dead;
+	t_monitor		*monitor;
+	int				nb_philo;
+	int				ret;
+	t_table			*philo;
+	int				dead;
 
 	monitor = arg;
 	philo = monitor->head;
@@ -83,7 +97,8 @@ void	*monitoring(void *arg)
 	dead = 0;
 	ret = 0;
 	while (ret != nb_philo)
-	{	if (dead == 0)
+	{
+		if (dead == 0)
 			dead = checking_death(philo, nb_philo);
 		ret = philosophers_done(monitor, ASK);
 		usleep(100);

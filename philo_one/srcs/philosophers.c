@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/09/07 17:15:14 by pminne            #+#    #+#             */
+/*   Updated: 2020/09/07 17:15:15 by pminne           ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
-long	timestamp(void)
+long		timestamp(void)
 {
-	long		ret;
-	struct timeval	tv;
+	long				ret;
+	struct timeval		tv;
 
 	ret = 0;
 	gettimeofday(&tv, NULL);
@@ -11,16 +23,16 @@ long	timestamp(void)
 	return (ret);
 }
 
-void	action(t_table *philo, long time,  int state)
+void	action(t_table *philo, long time, int state)
 {
 	print_state(philo, philo->id, state);
 	usleep(time * 1000);
 }
 
-void	*philosophize(void *arg)
+void		*philosophize(void *arg)
 {
-	t_table *philo;
-	int	count;
+	t_table		*philo;
+	int			count;
 
 	philo = arg;
 	pthread_mutex_lock(&philo->meal->mtx);
@@ -33,7 +45,8 @@ void	*philosophize(void *arg)
 		if (is_someone_dead(philo) == 1)
 			break ;
 		pthread_mutex_lock(&philo->meal->mtx);
-		philo->meal->time_meal = (timestamp() - philo->meal->start_program) - philo->meal->last_meal;
+		philo->meal->time_meal = (timestamp() - philo->meal->start_program)
+			- philo->meal->last_meal;
 		if (philo->meal->time_meal > philo->meal->time_to_starve)
 		{
 			pthread_mutex_unlock(&philo->meal->mtx);
@@ -61,7 +74,7 @@ void	*philosophize(void *arg)
 	return (NULL);
 }
 
-void	free_all(t_table *philo)
+void		free_all(t_table *philo)
 {
 	t_table	*tmp;
 
@@ -83,7 +96,7 @@ void	free_all(t_table *philo)
 	}
 }
 
-void	start_philosophers(t_args *args, t_table *philo)
+void		start_philosophers(t_args *args, t_table *philo)
 {
 	int i;
 
@@ -98,7 +111,7 @@ void	start_philosophers(t_args *args, t_table *philo)
 	}
 }
 
-void	start_monitoring(t_monitor *monitor)
+void		start_monitoring(t_monitor *monitor)
 {
 	pthread_t	mtr;
 
@@ -106,10 +119,10 @@ void	start_monitoring(t_monitor *monitor)
 	pthread_join(mtr, NULL);
 }
 
-int main(int ac, char **av)
+int		main(int ac, char **av)
 {
-	t_args	*args;
-	t_table	*philo;
+	t_args		*args;
+	t_table		*philo;
 	t_monitor	*monitor;
 
 	monitor = NULL;

@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set_philosophers.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/09/07 17:15:26 by pminne            #+#    #+#             */
+/*   Updated: 2020/09/07 17:15:27 by pminne           ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
-t_time *set_time(void)
+t_time			*set_time(void)
 {
-	t_time		*time;
+	t_time			*time;
 	struct timeval	tv;
 
 	if (!(time = malloc(sizeof(t_time))))
@@ -13,14 +25,40 @@ t_time *set_time(void)
 	return (time);
 }
 
-t_table *set_philosophers(t_args *args, t_monitor *mtr)
+t_info			*set_meal(long start_program, long time_to_starve)
 {
-	int	count;
+	t_info	*meal;
+
+	meal = NULL;
+	if (!(meal = malloc(sizeof(t_info))))
+		return (NULL);
+	pthread_mutex_init(&meal->mtx, NULL);
+	meal->last_meal = 0;
+	meal->time_meal = 0;
+	meal->start_program = start_program;
+	meal->time_to_starve = time_to_starve;
+	return (meal);
+}
+
+void			copy_args(t_table *philo, t_args *args, int count)
+{
+	philo->id = count;
+	philo->nb_philo = args->nb_philo;
+	philo->time_to_eat = args->time_to_eat;
+	philo->time_to_sleep = args->time_to_sleep;
+	philo->time_to_starve = args->time_to_starve;
+	philo->turns = args->n_time_must_eat;
+	philo->start_program = time->start_program;
+}
+
+t_table			*set_philosophers(t_args *args, t_monitor *mtr)
+{
+	int		count;
 	t_table	*head;
 	t_table	*tmp;
 	t_table	*philo;
 	t_time	*time;
-	t_write *write;
+	t_write	*write;
 
 	count = 1;
 	head = NULL;
@@ -41,23 +79,12 @@ t_table *set_philosophers(t_args *args, t_monitor *mtr)
 		}
 		if (count == 1)
 			head = philo;
-		philo->id = count;
-		philo->nb_philo = args->nb_philo;
-		philo->time_to_eat = args->time_to_eat;
-		philo->time_to_sleep = args->time_to_sleep;
-		philo->time_to_starve = args->time_to_starve;
-		philo->turns = args->n_time_must_eat;
-		philo->start_program = time->start_program;
+		copy_args(philo, args, count);
 		philo->monitor = mtr;
-		// Meal
-		philo->meal = malloc(sizeof(t_info));
-		pthread_mutex_init(&philo->meal->mtx, NULL);
-		philo->meal->last_meal = 0;
-		philo->meal->time_meal = 0;
-		philo->meal->start_program = philo->start_program;
-		philo->meal->time_to_starve = philo->time_to_starve;
-		//set_monitor(philo, tmp, count);
-		philo->write = write;
+		philo->meal = set_meal(philo->start_program, philo->time_to_starve);
+		if (!philo->meal)
+			return (NULL);
+				philo->write = write;
 		if (philo->turns == 0)
 			philo->turns = -1;
 		if (!(philo->r_fork = malloc(sizeof(t_fork))))
@@ -71,6 +98,5 @@ t_table *set_philosophers(t_args *args, t_monitor *mtr)
 	}
 	tmp->next = head;
 	head->prev = tmp;
-	//mtr = head->monitor;
 	return (head);
 }
