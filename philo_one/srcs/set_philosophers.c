@@ -12,91 +12,69 @@
 
 #include "philosophers.h"
 
-t_time			*set_time(void)
+int				swap2(t_table *philo, t_table **tmp, t_time *time)
 {
-	t_time			*time;
-	struct timeval	tv;
-
-	if (!(time = malloc(sizeof(t_time))))
-		return (NULL);
-	pthread_mutex_init(&time->time_lock, NULL);
-	gettimeofday(&tv, NULL);
-	time->start_program = (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-	return (time);
+	philo->time = time;
+	philo->next = NULL;
+	*tmp = philo;
+	philo = philo->next;
+	return (1);
 }
 
-t_info			*set_meal(long start_program, long time_to_starve)
+void			last_swap(t_table *tmp, t_table *head)
 {
-	t_info	*meal;
-
-	meal = NULL;
-	if (!(meal = malloc(sizeof(t_info))))
-		return (NULL);
-	pthread_mutex_init(&meal->mtx, NULL);
-	meal->last_meal = 0;
-	meal->time_meal = 0;
-	meal->start_program = start_program;
-	meal->time_to_starve = time_to_starve;
-	return (meal);
+	tmp->next = head;
+	head->prev = tmp;
 }
 
-void			copy_args(t_table *philo, t_args *args, int count)
+int				meal_and_fork(t_table *philo, t_write *write)
 {
-	philo->id = count;
-	philo->nb_philo = args->nb_philo;
-	philo->time_to_eat = args->time_to_eat;
-	philo->time_to_sleep = args->time_to_sleep;
-	philo->time_to_starve = args->time_to_starve;
-	philo->turns = args->n_time_must_eat;
-	philo->start_program = time->start_program;
+	if (!(philo->meal = set_meal(philo->start_program,
+		philo->time_to_starve)))
+		return (1);
+	if (set_fork(philo, write))
+		return (1);
+	return (0);
+}
+
+t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
+	t_write *write, int count)
+{
+	t_time	*time;
+	t_table	*philo;
+	t_table	*head;
+	t_table	*tmp;
+
+	time = NULL;
+	tmp = NULL;
+	philo = NULL;
+	head = NULL;
+	if (!(time = set_time()))
+		return (NULL);
+	while (count <= args->nb_philo)
+	{
+		if (!(philo = malloc(sizeof(t_table))))
+			return (NULL);
+		(tmp) ? swap1(tmp, philo) : 0;
+		(count == 1) ? (head = philo) : 0;
+		copy_args(philo, args, count, time->start_program);
+		philo->monitor = mtr;
+		if (meal_and_fork(philo, write))
+			return (NULL);
+		count += swap2(philo, &tmp, time);
+	}
+	last_swap(tmp, head);
+	return (head);
 }
 
 t_table			*set_philosophers(t_args *args, t_monitor *mtr)
 {
 	int		count;
-	t_table	*head;
-	t_table	*tmp;
-	t_table	*philo;
-	t_time	*time;
 	t_write	*write;
 
 	count = 1;
-	head = NULL;
-	tmp = NULL;
-	philo = NULL;
-	time = set_time();
 	if (!(write = malloc(sizeof(t_write))))
 		return (NULL);
 	pthread_mutex_init(&write->writing, NULL);
-	while (count <= args->nb_philo)
-	{
-		if (!(philo = malloc(sizeof(t_table))))
-			printf("Error malloc philo\n");
-		if (tmp)
-		{
-			tmp->next = philo;
-			philo->prev = tmp;
-		}
-		if (count == 1)
-			head = philo;
-		copy_args(philo, args, count);
-		philo->monitor = mtr;
-		philo->meal = set_meal(philo->start_program, philo->time_to_starve);
-		if (!philo->meal)
-			return (NULL);
-				philo->write = write;
-		if (philo->turns == 0)
-			philo->turns = -1;
-		if (!(philo->r_fork = malloc(sizeof(t_fork))))
-			printf("Error malloc fork_n");
-		pthread_mutex_init(&philo->r_fork->fork, NULL);
-		philo->time = time;
-		philo->next = NULL;
-		tmp = philo;
-		philo = philo->next;
-		count++;
-	}
-	tmp->next = head;
-	head->prev = tmp;
-	return (head);
+	return (set_philosophers2(args, mtr, write, count));
 }

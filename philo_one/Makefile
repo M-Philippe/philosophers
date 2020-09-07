@@ -11,7 +11,7 @@
 #                                                         /                    #
 # **************************************************************************** #
 
-CFLAGS	= -Wall -Wextra -Werror -g3 -fsanitize=address
+CFLAGS	= -Wall -Wextra -Werror -g3 #-fsanitize=address
 
 NAME	=	philo_one
 
@@ -19,6 +19,7 @@ SRCS_D = ./srcs/
 
 COMP	=	$(SRCS_D)philosophers.c\
 			$(SRCS_D)set_philosophers.c\
+			$(SRCS_D)set_philosophers2.c\
 			$(SRCS_D)fork.c\
 			$(SRCS_D)ft_putnbr_fd.c\
 			$(SRCS_D)parsing.c\

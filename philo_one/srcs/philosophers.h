@@ -106,6 +106,15 @@ t_table			*set_philosophers(t_args *args, t_monitor *mtr);
 int				philosophers_done(t_monitor *mtr, int flag);
 void			ft_putnbr_fd(int n, int fd);
 /*
+**	SET_PHILOSOPHERS2.C
+*/
+t_time			*set_time(void);
+t_info			*set_meal(long start_program, long time_to_starve);
+void			copy_args(t_table *philo, t_args *args,
+	int count, long start_program);
+void			swap1(t_table *tmp, t_table *philo);
+int				set_fork(t_table *philo, t_write *write);
+/*
 **	X
 */
 int				is_someone_dead(t_table *philo);
