@@ -90,7 +90,7 @@ int			main(int ac, char **av)
 	if (!philo)
 	{
 		free(args);
-		free(philo);
+		free(monitor);
 		return (0);
 	}
 	return (set_monitor(monitor, philo, args));

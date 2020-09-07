@@ -36,6 +36,24 @@ int				meal_and_fork(t_table *philo, t_write *write)
 	return (0);
 }
 
+void			*free_table(t_table *philo, t_write *write)
+{
+	t_table		*tmp;
+
+	tmp = NULL;
+	free(write);
+	while (philo)
+	{
+		tmp = philo;
+		philo = philo->prev;
+		(tmp->meal) ? (free(tmp->meal)) : 0;
+		(tmp->r_fork) ? (free(tmp->r_fork)) : 0;
+		free(tmp);
+		tmp = NULL;
+	}
+	return (NULL);
+}
+
 t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
 	t_write *write, int count)
 {
@@ -51,13 +69,14 @@ t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
 	while (count <= args->nb_philo)
 	{
 		if (!(philo = malloc(sizeof(t_table))))
-			return (NULL);
+			return (free_table(tmp, write));
 		(tmp) ? swap1(tmp, philo) : 0;
+		(count == 1) ? (philo->prev = NULL) : 0;
 		(count == 1) ? (head = philo) : 0;
 		copy_args(philo, args, count, start_program);
 		philo->monitor = mtr;
 		if (meal_and_fork(philo, write))
-			return (NULL);
+			return (free_table(philo, write));
 		count += swap2(philo, &tmp);
 	}
 	last_swap(tmp, head);
