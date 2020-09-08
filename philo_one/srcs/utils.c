@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include "philosophers.h"
 
 void			ft_putnbr_fd(long n, int fd)
 {
@@ -53,7 +53,7 @@ static int		ft_is_number(char *s)
 	i = 0;
 	while (s[i])
 	{
-		if (s[i] < '0' && s[i] > '9')
+		if (s[i] < '0' || s[i] > '9')
 			return (1);
 		i++;
 	}
@@ -85,4 +85,22 @@ int				ft_atoi(char *s)
 		i++;
 	}
 	return (nb == 0 ? -1 : nb);
+}
+
+void			*free_table(t_table *philo, t_write *write)
+{
+	t_table		*tmp;
+
+	tmp = NULL;
+	free(write);
+	while (philo)
+	{
+		tmp = philo;
+		philo = philo->prev;
+		(tmp->meal) ? (free(tmp->meal)) : 0;
+		(tmp->r_fork) ? (free(tmp->r_fork)) : 0;
+		free(tmp);
+		tmp = NULL;
+	}
+	return (NULL);
 }

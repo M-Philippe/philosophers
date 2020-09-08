@@ -36,24 +36,6 @@ int				meal_and_fork(t_table *philo, t_write *write)
 	return (0);
 }
 
-void			*free_table(t_table *philo, t_write *write)
-{
-	t_table		*tmp;
-
-	tmp = NULL;
-	free(write);
-	while (philo)
-	{
-		tmp = philo;
-		philo = philo->prev;
-		(tmp->meal) ? (free(tmp->meal)) : 0;
-		(tmp->r_fork) ? (free(tmp->r_fork)) : 0;
-		free(tmp);
-		tmp = NULL;
-	}
-	return (NULL);
-}
-
 t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
 	t_write *write, int count)
 {

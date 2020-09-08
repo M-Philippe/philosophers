@@ -93,7 +93,7 @@ void			free_fork(t_table *philo);
 t_args			*parsing(int ac, char **av);
 t_table			*set_philosophers(t_args *args, t_monitor *mtr);
 int				philosophers_done(t_monitor *mtr, int flag);
-void			ft_putnbr_fd(int n, int fd);
+void			ft_putnbr_fd(long n, int fd);
 /*
 **	SET_PHILOSOPHERS2.C
 */
@@ -129,5 +129,6 @@ void			free_all(t_table *philo);
 unsigned int	ft_strlen(char *s);
 void			*philosophize(void *arg);
 int				ft_atoi(char *s);
+void			*free_table(t_table *philo, t_write *write);
 
 #endif
