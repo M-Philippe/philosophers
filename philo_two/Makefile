@@ -1,0 +1,49 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
+#    Updated: 2020/09/08 00:05:13 by pminne           ###   ########lyon.fr    #
+#                                                                              #
+# **************************************************************************** #
+
+
+CFLAGS	= -Wall -Wextra -g3#-Werror -g3 #-fsanitize=address
+
+NAME	=	philo_two
+
+SRCS_D = ./srcs/
+
+COMP	=	$(SRCS_D)main.c\
+			$(SRCS_D)philosophize.c\
+			$(SRCS_D)set_philosophers.c\
+			$(SRCS_D)set_philosophers2.c\
+			$(SRCS_D)fork.c\
+			$(SRCS_D)utils.c\
+			$(SRCS_D)parsing.c\
+			$(SRCS_D)monitor.c\
+			$(SRCS_D)print.c\
+			$(SRCS_D)ft_itoa.c\
+
+OBJ	=	$(COMP:.c=.o)
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	clang -pthread $(CFLAGS) -o $(NAME) $(OBJ)
+
+%.o: %.c
+	clang $(CFLAGS) -o $@ -c $<
+
+clean:
+	rm -rf $(OBJ)
+
+fclean: clean
+	rm -rf $(NAME)
+
+re: fclean all
+
+.PHONY: all fclean clean re
