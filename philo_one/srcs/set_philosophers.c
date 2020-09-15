@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:26 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/08 00:04:58 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/15 17:34:51 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,12 @@ t_table			*set_philosophers2(t_args *args, t_monitor *mtr,
 		count += swap2(philo, &tmp);
 	}
 	last_swap(tmp, head);
+	start_program = timestamp();
+	for (int i = 0; i < args->nb_philo; i++)
+	{
+		head->start_program = start_program;
+		head->meal->start_program = start_program;
+	}
 	return (head);
 }
 
