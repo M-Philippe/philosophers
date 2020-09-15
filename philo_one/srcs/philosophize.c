@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/08 00:04:51 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/08 00:04:51 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/15 17:53:22 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,13 @@ void		*philosophize(void *arg)
 {
 	t_table		*philo;
 	int			count;
+	long		start_program;
 
 	philo = arg;
+	start_program = timestamp();
 	pthread_mutex_lock(&philo->meal->mtx);
+	philo->meal->start_program = start_program;
+	philo->start_program = start_program;
 	philo->meal->time_meal = 0;
 	philo->meal->last_meal = philo->start_program;
 	pthread_mutex_unlock(&philo->meal->mtx);
