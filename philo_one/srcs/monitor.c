@@ -6,11 +6,13 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:07 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/08 00:04:40 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/16 10:48:05 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+int		g_vrb;
 
 int		is_someone_dead(t_table *philo)
 {

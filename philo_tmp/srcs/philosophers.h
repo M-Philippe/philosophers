@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/11 02:44:44 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/16 13:34:36 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@
 # define SET 0
 # define ASK 1
 
+int		g_philo_is_dead;
+int		g_philo_are_done;
+
 typedef	struct	s_args
 {
 	int		nb_philo;
@@ -46,6 +49,7 @@ typedef struct	s_write
 
 typedef struct	s_fork
 {
+	int				id;
 	pthread_mutex_t	fork;
 }				t_fork;
 
@@ -62,82 +66,31 @@ typedef struct	s_info
 	pthread_mutex_t	mtx;
 }				t_info;
 
-typedef struct	s_monitor
-{
-	int				someone_died;
-	int				done;
-	int				nb_philo;
-	struct s_table	*head;
-	pthread_mutex_t	mtx;
-}				t_monitor;
-
 typedef struct	s_table
 {
 	int				id;
-	t_fork			*r_fork;
+	t_fork			r_fork;
 	t_write			*write;
-	t_info			*meal;
+	//t_info			*meal;
 	pthread_t		th;
 	pthread_t		th_meal;
-	struct s_table	*prev;
-	struct s_table	*next;
-	t_monitor		*monitor;
 	long			start_program;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				time_to_starve;
-	long			time_meal;
 	long			last_meal;
 	int				nb_philo;
+	int				left_hand;
 	int				turns;
-	int				use_hand;
+	pthread_mutex_t	meal;
 }				t_table;
 
-void			take_fork(t_table *philo);
-void			free_fork(t_table *philo);
 t_args			*parsing(int ac, char **av);
-t_table			*set_philosophers(t_args *args, t_monitor *mtr);
-int				philosophers_done(t_monitor *mtr, int flag);
-void			ft_putnbr_fd(long n, int fd);
-/*
-**	SET_PHILOSOPHERS2.C
-*/
-long			set_time(void);
-t_info			*set_meal(long start_program, long time_to_starve);
-void			copy_args(t_table *philo, t_args *args,
-	int count, long start_program);
-void			swap1(t_table *tmp, t_table *philo);
-int				set_fork(t_table *philo, t_write *write);
-/*
-**	X
-*/
-int				is_someone_dead(t_table *philo);
-int				is_dead(t_table *philo);
-/*
-**	MONITOR.C
-*/
-void			*monitoring(void *arg);
-int				is_dead(t_table *philo);
-int				philosophers_done(t_monitor *mtr, int flag);
-int				is_someone_dead(t_table *philo);
-/*
-**	PRINT.C
-*/
-void			print_state(t_table *philo, int id, int state);
-void			print_death(int id, long t_stamp);
-/*
-**	X
-*/
-long			timestamp(void);
-void			action(t_table *philo, long time, int state);
-void			free_all(t_table *philo);
-unsigned int	ft_strlen(char *s);
-void			*philosophize(void *arg);
 int				ft_atoi(char *s);
-void			*free_table(t_table *philo, t_write *write);
+unsigned int	ft_strlen(char *s);
+void			ft_putnbr_fd(long n, int fd);
+void	print_state(t_table *philo, int id, int state, int f_id);
+long		timestamp(void);
+void	print_death(t_table *philo, long t_stamp);
 
-
-
-int		someone_is_dead(t_info *meal, int id, int timestamp);
-int		is_someone_dead(t_table *philo);
 #endif

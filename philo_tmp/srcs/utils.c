@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:17:44 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/08 00:05:06 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/16 11:02:48 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,22 +85,4 @@ int				ft_atoi(char *s)
 		i++;
 	}
 	return (nb == 0 ? -1 : nb);
-}
-
-void			*free_table(t_table *philo, t_write *write)
-{
-	t_table		*tmp;
-
-	tmp = NULL;
-	free(write);
-	while (philo)
-	{
-		tmp = philo;
-		philo = philo->prev;
-		(tmp->meal) ? (free(tmp->meal)) : 0;
-		(tmp->r_fork) ? (free(tmp->r_fork)) : 0;
-		free(tmp);
-		tmp = NULL;
-	}
-	return (NULL);
 }
