@@ -134,6 +134,18 @@ void		*philo_meal(void *arg)
 	}
 }
 
+void ft_usleep(long time, long timestamp)
+{
+	struct timeval tv;
+
+	while (1)
+	{
+		gettimeofday(&tv, NULL);
+		if ((tv.tv_sec * 1000 + tv.tv_usec /1000) - timestamp >= time)
+			break ;
+	}
+}
+
 void		*philosophize(void *arg)
 {
 	t_table		*philo;
@@ -155,10 +167,10 @@ void		*philosophize(void *arg)
 		philo->last_meal = timestamp();
 		pthread_mutex_unlock(&philo->meal);
 		print_state(philo, philo->id, EATING, 0);
-		usleep(philo->time_to_eat * 1000);
+		ft_usleep(philo->time_to_eat, timestamp());
 		free_fork(philo, philo->id, philo->other_hand);
 		print_state(philo, philo->id, SLEEPING, 0);
-		usleep(philo->time_to_sleep * 1000);
+		ft_usleep(philo->time_to_sleep, timestamp());
 		print_state(philo, philo->id, THINKING, 0);
 		count++;
 		pthread_mutex_lock(&philo->g_mtx->g_dead);
