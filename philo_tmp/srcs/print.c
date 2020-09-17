@@ -20,6 +20,14 @@ void	print_state(t_table *philo, int id, int state, int fork_id)
 		pthread_mutex_unlock(&philo->write->writing);
 		return ;
 	}*/
+	pthread_mutex_lock(&philo->g_mtx->g_dead);
+	if (g_someone_is_dead == 1)
+	{
+		pthread_mutex_unlock(&philo->g_mtx->g_dead);
+		pthread_mutex_unlock(&philo->write->writing);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->g_mtx->g_dead);
 	ft_putnbr_fd((timestamp() - philo->start_program), 1);
 	write(1, " ", 1);
 	ft_putnbr_fd(id + 1, 1);

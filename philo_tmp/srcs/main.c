@@ -37,6 +37,7 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 {
 	t_write		*write;
 	t_fork		*fork;
+	t_gbl_var	*g_mtx;
 	int			i;
 
 	i = 0;
@@ -47,6 +48,10 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 		return (NULL);
 	if (!(fork = malloc(sizeof(*fork) * args->nb_philo)))
 		printf("Error malloc\n");
+	if (!(g_mtx = malloc(sizeof(t_gbl_var))))
+		printf("Error malloc\n");
+	pthread_mutex_init(&g_mtx->g_dead, NULL);
+	pthread_mutex_init(&g_mtx->g_done, NULL);
 	for (int i = 0; i < args->nb_philo; i++)
 	{
 		pthread_mutex_init(&fork[i].fork, NULL);
@@ -60,6 +65,7 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 		//(*philo)[i].r_fork.id = i;
 		pthread_mutex_init(&(*philo)[i].meal, NULL);
 		(*philo)[i].fork = fork;
+		(*philo)[i].g_mtx = g_mtx;
 		i++;
 	}
 	printf("Allocate Done\n");
@@ -86,8 +92,16 @@ void		take_fork(t_table *philo, int id, int other_hand)
 
 void		free_fork(t_table *philo, int id, int other_hand)
 {
-	pthread_mutex_unlock(&philo->fork[other_hand].fork);
-	pthread_mutex_unlock(&philo->fork[id].fork);
+	if (philo->id == philo->nb_philo -1)
+	{
+		pthread_mutex_unlock(&philo->fork[id].fork);
+		pthread_mutex_unlock(&philo->fork[other_hand].fork);
+	}
+	else
+	{
+		pthread_mutex_unlock(&philo->fork[other_hand].fork);
+		pthread_mutex_unlock(&philo->fork[id].fork);
+	}
 }
 
 void		*philo_meal(void *arg)
@@ -102,8 +116,18 @@ void		*philo_meal(void *arg)
 		t_stamp = timestamp();
 		if (t_stamp - philo->last_meal > philo->time_to_starve)
 		{
+			pthread_mutex_lock(&philo->g_mtx->g_dead);
+			if (g_someone_is_dead == 1)
+			{
+				pthread_mutex_unlock(&philo->g_mtx->g_dead);
+				pthread_mutex_unlock(&philo->meal);
+				return (NULL);
+			}
+			g_someone_is_dead = 1;
+			pthread_mutex_unlock(&philo->g_mtx->g_dead);
 			print_death(philo, t_stamp - philo->start_program);
-			exit (0);
+			pthread_mutex_unlock(&philo->meal);
+			return (NULL);
 		}
 		pthread_mutex_unlock(&philo->meal);
 		usleep(1000);
@@ -124,7 +148,7 @@ void		*philosophize(void *arg)
 	philo->last_meal = philo->start_program;
 	pthread_create(&philo->th_meal, NULL, philo_meal, philo);
 	pthread_detach(philo->th_meal);
-	while (count < 3)
+	while (count != philo->turns)
 	{
 		take_fork(philo, philo->id, philo->other_hand);
 		pthread_mutex_lock(&philo->meal);
@@ -136,8 +160,15 @@ void		*philosophize(void *arg)
 		print_state(philo, philo->id, SLEEPING, 0);
 		usleep(philo->time_to_sleep * 1000);
 		print_state(philo, philo->id, THINKING, 0);
-		count = 0;
+		count++;
+		pthread_mutex_lock(&philo->g_mtx->g_dead);
+		if (g_someone_is_dead == 1)
+			count = philo->turns;
+		pthread_mutex_unlock(&philo->g_mtx->g_dead);
 	}
+	pthread_mutex_lock(&philo->g_mtx->g_done);
+	g_philos_are_done++;
+	pthread_mutex_unlock(&philo->g_mtx->g_done);
 	return (NULL);
 }
 
@@ -145,8 +176,12 @@ void		start_philosophers(t_table *philo, t_args *args)
 {
 	int		i;
 	long	start_program;
+	int		done;
+	t_gbl_var		*g_mtx;
 
 	i = 0;
+	done = 0;
+	g_mtx = philo[0].g_mtx;
 	start_program = timestamp();
 	while (i < args->nb_philo)
 	{
@@ -155,7 +190,15 @@ void		start_philosophers(t_table *philo, t_args *args)
 		pthread_detach(philo[i].th);
 		i++;
 	}
-	sleep(50);
+	while (done < args->nb_philo)
+	{
+		usleep(100);
+		pthread_mutex_lock(&g_mtx->g_done);
+		done = g_philos_are_done;
+		pthread_mutex_unlock(&g_mtx->g_done);
+	}
+	printf("Everyone is done\n");
+	exit(0);
 }
 
 int			main(int ac, char **av)
@@ -165,6 +208,8 @@ int			main(int ac, char **av)
 
 	args = NULL;
 	philo = NULL;
+	g_someone_is_dead = 0;
+	g_philos_are_done = 0;
 	args = parsing(ac, av);
 	if (!args)
 		return (0);

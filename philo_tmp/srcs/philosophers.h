@@ -30,8 +30,8 @@
 # define SET 0
 # define ASK 1
 
-int		g_philo_is_dead;
-int		g_philo_are_done;
+int		g_someone_is_dead;
+int		g_philos_are_done;
 
 typedef	struct	s_args
 {
@@ -53,6 +53,13 @@ typedef struct	s_fork
 	pthread_mutex_t	fork;
 }				t_fork;
 
+typedef struct	s_gbl_var
+{
+	pthread_mutex_t		g_dead;
+	pthread_mutex_t		g_done;
+}				t_gbl_var;
+
+
 typedef struct	s_info
 {
 	long			last_meal;
@@ -72,6 +79,7 @@ typedef struct	s_table
 	t_fork			r_fork;
 	t_write			*write;
 	//t_info			*meal;
+	t_gbl_var		*g_mtx;
 	pthread_t		th;
 	pthread_t		th_meal;
 	long			start_program;
