@@ -187,7 +187,7 @@ void		start_philosophers(t_table *philo, t_args *args)
 	{
 		philo[i].start_program = start_program;
 		pthread_create(&philo[i].th, NULL, philosophize, &philo[i]);
-		pthread_detach(philo[i].th);
+		(i == args->nb_philo - 1) ? (pthread_join(philo[i].th, NULL)) : (pthread_detach(philo[i].th));
 		i++;
 	}
 	while (done < args->nb_philo)
