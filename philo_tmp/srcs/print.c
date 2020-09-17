@@ -22,11 +22,11 @@ void	print_state(t_table *philo, int id, int state, int fork_id)
 	}*/
 	ft_putnbr_fd((timestamp() - philo->start_program), 1);
 	write(1, " ", 1);
-	ft_putnbr_fd(id, 1);
+	ft_putnbr_fd(id + 1, 1);
 	if (state == FORK)
 	{
 		write(1, " has taken a fork ", ft_strlen(" has taken a fork\n"));
-		ft_putnbr_fd(fork_id, 1);
+		ft_putnbr_fd(fork_id + 1, 1);
 		write(1, "\n", 1);
 	}
 	else if (state == EATING)

@@ -80,8 +80,9 @@ typedef struct	s_table
 	int				time_to_starve;
 	long			last_meal;
 	int				nb_philo;
-	int				left_hand;
+	int				other_hand;
 	int				turns;
+	t_fork			*fork;
 	pthread_mutex_t	meal;
 }				t_table;
 
