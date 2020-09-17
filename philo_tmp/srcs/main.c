@@ -114,6 +114,11 @@ void		*philo_meal(void *arg)
 	{
 		pthread_mutex_lock(&philo->meal);
 		t_stamp = timestamp();
+		if (philo->stop_meal == 1)
+		{
+			pthread_mutex_unlock(&philo->meal);
+			return (NULL);
+		}
 		if (t_stamp - philo->last_meal > philo->time_to_starve)
 		{
 			pthread_mutex_lock(&philo->g_mtx->g_dead);
@@ -153,6 +158,7 @@ void		*philosophize(void *arg)
 
 	philo = arg;
 	count = 0;
+	philo->stop_meal = 0;
 	if (philo->id == 0)
 		philo->other_hand = philo->nb_philo - 1;
 	else
@@ -160,7 +166,7 @@ void		*philosophize(void *arg)
 	philo->last_meal = philo->start_program;
 	pthread_create(&philo->th_meal, NULL, philo_meal, philo);
 	pthread_detach(philo->th_meal);
-	while (count != philo->turns)
+	while (1)
 	{
 		take_fork(philo, philo->id, philo->other_hand);
 		pthread_mutex_lock(&philo->meal);
@@ -169,14 +175,28 @@ void		*philosophize(void *arg)
 		print_state(philo, philo->id, EATING, 0);
 		ft_usleep(philo->time_to_eat, timestamp());
 		free_fork(philo, philo->id, philo->other_hand);
-		print_state(philo, philo->id, SLEEPING, 0);
-		ft_usleep(philo->time_to_sleep, timestamp());
-		print_state(philo, philo->id, THINKING, 0);
+		// EAT
 		count++;
 		pthread_mutex_lock(&philo->g_mtx->g_dead);
 		if (g_someone_is_dead == 1)
-			count = philo->turns;
+		{
+			pthread_mutex_unlock(&philo->g_mtx->g_dead);
+			break ;
+		}
+		pthread_mutex_lock(&philo->meal);
+		if (count == philo->turns)
+		{
+			philo->stop_meal = 1;
+			pthread_mutex_unlock(&philo->meal);
+			pthread_mutex_unlock(&philo->g_mtx->g_dead);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->meal);
 		pthread_mutex_unlock(&philo->g_mtx->g_dead);
+		// EAT
+		print_state(philo, philo->id, SLEEPING, 0);
+		ft_usleep(philo->time_to_sleep, timestamp());
+		print_state(philo, philo->id, THINKING, 0);
 	}
 	pthread_mutex_lock(&philo->g_mtx->g_done);
 	g_philos_are_done++;

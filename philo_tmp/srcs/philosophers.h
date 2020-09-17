@@ -90,6 +90,7 @@ typedef struct	s_table
 	int				nb_philo;
 	int				other_hand;
 	int				turns;
+	int				stop_meal;
 	t_fork			*fork;
 	pthread_mutex_t	meal;
 }				t_table;
