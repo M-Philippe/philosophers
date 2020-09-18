@@ -51,23 +51,21 @@ void		*error_allocate(t_table **philo, t_write *writing, t_fork *fork, int msg)
 	return (NULL);
 }
 
-int			init_mutex(t_table **philo, t_args *args, t_fork *fork)
+int			init_mutex(t_table **philo, t_args *args, t_fork *fork, t_gbl_var **g_mtx)
 {
 	int			i;
-	t_gbl_var	*g_mtx;
 	int			ret;
 
-	g_mtx = NULL;
 	i = 0;
 	ret = 0;
-	if (!(g_mtx = malloc(sizeof(t_gbl_var))))
+	if (!((*g_mtx) = malloc(sizeof(t_gbl_var))))
 	{
-		free(g_mtx);
+		free(*g_mtx);
 		return (1);
 	}
 	ret += pthread_mutex_init(&(*philo)[0].write->writing, NULL);
-	ret += pthread_mutex_init(&g_mtx->g_dead, NULL);
-	ret += pthread_mutex_init(&g_mtx->g_done, NULL);
+	ret += pthread_mutex_init(&(*g_mtx)->g_dead, NULL);
+	ret += pthread_mutex_init(&(*g_mtx)->g_done, NULL);
 	while (i < args->nb_philo)
 	{
 		(*philo)[i].fork = fork;
@@ -75,7 +73,7 @@ int			init_mutex(t_table **philo, t_args *args, t_fork *fork)
 		copy_args(&(*philo)[i], args, i);
 		(*philo)[i].write = (*philo)[0].write;
 		ret += pthread_mutex_init(&(*philo)[i].meal, NULL);
-		(*philo)[i].g_mtx = g_mtx;
+		(*philo)[i].g_mtx = (*g_mtx);
 		i++;
 	}
 	return (ret);
@@ -85,9 +83,11 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 {
 	t_write		*write;
 	t_fork		*fork;
+	t_gbl_var	*g_mtx;
 
 	write = NULL;
 	fork = NULL;
+	g_mtx = NULL;
 	if (!(write = malloc(sizeof(*write))))
 		return (error_allocate(philo, write, fork, MALLOC_WRITE));
 	if (!(*philo = malloc(sizeof(**philo) * args->nb_philo)))
@@ -97,7 +97,7 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 	(*philo)[0].write = write;
 	(*philo)[0].fork = fork;
 	(*philo)[0].fork = fork;
-	if (init_mutex(philo, args, fork))
+	if (init_mutex(philo, args, fork, &g_mtx))
 		return (error_allocate(philo, write, fork, ERROR_MUTEX));
 	return (*philo);
 }
