@@ -31,6 +31,8 @@ static void		*perror_parsing(char *msg_error, t_args *args)
 
 static t_args	*fifth_args(char *av, t_args *args)
 {
+	g_someone_is_dead = 0;
+	g_philos_are_done = 0;
 	args->n_time_must_eat = ft_atoi(av);
 	if (args->n_time_must_eat == -1)
 		return (perror_parsing("Time_eat must be positive (zero out)\n", args));
@@ -47,8 +49,8 @@ t_args			*parsing(int ac, char **av)
 	if (!(args = malloc(sizeof(t_args))))
 		return (perror_parsing("Error malloc args\n", NULL));
 	args->nb_philo = ft_atoi(av[1]);
-	if (args->nb_philo == -1 || args->nb_philo == 1)
-		return (perror_parsing("Nb_philo must be positive (Two min)\n", args));
+	if (args->nb_philo == -1 || args->nb_philo == 1 || args->nb_philo > 200)
+		return (perror_parsing("Nb_philo must be positive ([2:200])\n", args));
 	args->time_to_starve = ft_atoi(av[2]);
 	if (args->time_to_starve == -1)
 		return (perror_parsing("Time_starve -> positive (zero out)\n", args));
