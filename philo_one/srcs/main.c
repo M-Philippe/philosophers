@@ -3,22 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
+/*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:14 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/16 14:30:03 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/19 13:10:49 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-long		timestamp(void)
-{
-	struct timeval		tv;
-
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-}
 
 void			copy_args(t_table *philo, t_args *args,
 	int count)
@@ -69,6 +61,7 @@ int			init_mutex(t_table **philo, t_args *args,
 	ret += pthread_mutex_init(&(*philo)[0].write->writing, NULL);
 	ret += pthread_mutex_init(&(*g_mtx)->g_dead, NULL);
 	ret += pthread_mutex_init(&(*g_mtx)->g_done, NULL);
+	ret += pthread_mutex_init(&(*g_mtx)->g_meals, NULL);
 	while (i < args->nb_philo)
 	{
 		(*philo)[i].fork = fork;
@@ -150,7 +143,7 @@ void		*philo_meal(void *arg)
 		if (philo->stop_meal == 1)
 		{
 			pthread_mutex_unlock(&philo->meal);
-			return (NULL);
+			break ;
 		}
 		if (t_stamp - philo->last_meal > philo->time_to_starve)
 		{
@@ -159,29 +152,21 @@ void		*philo_meal(void *arg)
 			{
 				pthread_mutex_unlock(&philo->g_mtx->g_dead);
 				pthread_mutex_unlock(&philo->meal);
-				return (NULL);
+				break ;
 			}
 			g_someone_is_dead = 1;
 			pthread_mutex_unlock(&philo->g_mtx->g_dead);
 			print_death(philo, t_stamp - philo->start_program);
 			pthread_mutex_unlock(&philo->meal);
-			return (NULL);
+			break ;
 		}
 		pthread_mutex_unlock(&philo->meal);
 		usleep(1000);
 	}
-}
-
-void		ft_usleep(long time, long timestamp)
-{
-	struct timeval tv;
-
-	while (1)
-	{
-		gettimeofday(&tv, NULL);
-		if ((tv.tv_sec * 1000 + tv.tv_usec /1000) - timestamp >= time)
-			break ;
-	}
+	pthread_mutex_lock(&philo->g_mtx->g_meals);
+	g_meals_are_done++;
+	pthread_mutex_unlock(&philo->g_mtx->g_meals);
+	return (NULL);
 }
 
 void		*philosophize(void *arg)
@@ -192,10 +177,8 @@ void		*philosophize(void *arg)
 	philo = arg;
 	count = 0;
 	philo->stop_meal = 0;
-	if (philo->id == 0)
-		philo->other_hand = philo->nb_philo - 1;
-	else
-		philo->other_hand = philo->id - 1;
+	(philo->id == 0) ? (philo->other_hand = philo->nb_philo - 1) :
+		(philo->other_hand = philo->id - 1);
 	philo->last_meal = philo->start_program;
 	pthread_create(&philo->th_meal, NULL, philo_meal, philo);
 	pthread_detach(philo->th_meal);
@@ -206,7 +189,7 @@ void		*philosophize(void *arg)
 		philo->last_meal = timestamp();
 		pthread_mutex_unlock(&philo->meal);
 		print_state(philo, philo->id, EATING);
-		ft_usleep(philo->time_to_eat, timestamp());
+		waiting(philo->time_to_eat, timestamp());
 		free_fork(philo, philo->id, philo->other_hand);
 		count++;
 		pthread_mutex_lock(&philo->g_mtx->g_dead);
@@ -215,18 +198,17 @@ void		*philosophize(void *arg)
 			pthread_mutex_unlock(&philo->g_mtx->g_dead);
 			break ;
 		}
+		pthread_mutex_unlock(&philo->g_mtx->g_dead);
 		pthread_mutex_lock(&philo->meal);
 		if (count == philo->turns)
 		{
 			philo->stop_meal = 1;
 			pthread_mutex_unlock(&philo->meal);
-			pthread_mutex_unlock(&philo->g_mtx->g_dead);
 			break ;
 		}
 		pthread_mutex_unlock(&philo->meal);
-		pthread_mutex_unlock(&philo->g_mtx->g_dead);
 		print_state(philo, philo->id, SLEEPING);
-		ft_usleep(philo->time_to_sleep, timestamp());
+		waiting(philo->time_to_sleep, timestamp());
 		print_state(philo, philo->id, THINKING);
 	}
 	pthread_mutex_lock(&philo->g_mtx->g_done);
@@ -235,24 +217,12 @@ void		*philosophize(void *arg)
 	return (NULL);
 }
 
-int			start_philosophers(t_table *philo, t_args *args)
+void		waiting_end_simulation(t_args *args, t_gbl_var *g_mtx)
 {
-	int		i;
-	long	start_program;
 	int		done;
-	t_gbl_var		*g_mtx;
 
-	i = 0;
 	done = 0;
-	g_mtx = philo[0].g_mtx;
-	start_program = timestamp();
-	while (i < args->nb_philo)
-	{
-		philo[i].start_program = start_program;
-		pthread_create(&philo[i].th, NULL, philosophize, &philo[i]);
-		(i == args->nb_philo - 1) ? (pthread_join(philo[i].th, NULL)) : (pthread_detach(philo[i].th));
-		i++;
-	}
+	pthread_mutex_unlock(&g_mtx->g_done);
 	while (done < args->nb_philo)
 	{
 		usleep(1000);
@@ -260,9 +230,36 @@ int			start_philosophers(t_table *philo, t_args *args)
 		done = g_philos_are_done;
 		pthread_mutex_unlock(&g_mtx->g_done);
 	}
-	usleep(10000);
+	done = 0;
+	while (done < args->nb_philo)
+	{
+		usleep(1000);
+		pthread_mutex_lock(&g_mtx->g_meals);
+		done = g_meals_are_done;
+		pthread_mutex_unlock(&g_mtx->g_meals);
+	}
+}
+
+void			start_philosophers(t_table *philo, t_args *args)
+{
+	int		i;
+	long	start_program;
+	t_gbl_var		*g_mtx;
+
+	i = 0;
+	g_mtx = philo[0].g_mtx;
+	start_program = timestamp();
+	while (i < args->nb_philo)
+	{
+		philo[i].start_program = start_program;
+		pthread_create(&philo[i].th, NULL, philosophize, &philo[i]);
+		(i == args->nb_philo - 1) ? (pthread_join(philo[i].th, NULL)) :
+			(pthread_detach(philo[i].th));
+		i++;
+	}
+	pthread_mutex_lock(&g_mtx->g_done);
+	waiting_end_simulation(args, g_mtx);
 	write(1, "End of simulation\n", ft_strlen("End of simulation\n"));
-	return (0);
 }
 
 void		destroy_mutex(t_table *philo, t_args *args, t_fork *fork)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+        */
+/*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/16 13:34:36 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/19 12:49:29 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 
 int		g_someone_is_dead;
 int		g_philos_are_done;
+int		g_meals_are_done;
 
 typedef	struct	s_args
 {
@@ -57,6 +58,7 @@ typedef struct	s_gbl_var
 {
 	pthread_mutex_t		g_dead;
 	pthread_mutex_t		g_done;
+	pthread_mutex_t		g_meals;
 }				t_gbl_var;
 
 
@@ -101,5 +103,6 @@ void			ft_putnbr_fd(long n, int fd);
 void	print_state(t_table *philo, int id, int state);
 long		timestamp(void);
 void	print_death(t_table *philo, long t_stamp);
+void		waiting(long time, long timestamp);
 
 #endif

@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: pminne <pminne@42lyon.student.fr>          +#+  +:+       +#+         #
+#    By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
-#    Updated: 2020/09/16 13:48:34 by pminne           ###   ########lyon.fr    #
+#    Updated: 2020/09/19 12:58:05 by pminne           ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 
-CFLAGS	= -Wall -Wextra -g3 #-fsanitize=leak
+CFLAGS	= -Wall -Wextra -g3 -fsanitize=thread
 
 NAME	=	philo_one
 
@@ -21,6 +21,7 @@ COMP	=	$(SRCS_D)main.c\
 			$(SRCS_D)utils.c\
 			$(SRCS_D)parsing.c\
 			$(SRCS_D)print.c\
+			$(SRCS_D)time.c\
 
 OBJ	=	$(COMP:.c=.o)
 
