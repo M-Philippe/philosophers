@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/19 12:49:29 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/19 13:48:34 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ typedef struct	s_write
 
 typedef struct	s_fork
 {
-	int				id;
 	pthread_mutex_t	fork;
 }				t_fork;
 
@@ -61,25 +60,10 @@ typedef struct	s_gbl_var
 	pthread_mutex_t		g_meals;
 }				t_gbl_var;
 
-
-typedef struct	s_info
-{
-	long			last_meal;
-	long			time_meal;
-	long			time_to_starve;
-	long			start_program;
-	int				is_done;
-	int				id;
-	t_write			*write;
-	struct s_monitor		*monitor;
-	pthread_mutex_t	mtx;
-}				t_info;
-
 typedef struct	s_table
 {
 	int				id;
 	t_write			*write;
-	//t_info			*meal;
 	t_gbl_var		*g_mtx;
 	pthread_t		th;
 	pthread_t		th_meal;
@@ -96,13 +80,48 @@ typedef struct	s_table
 	pthread_mutex_t	meal;
 }				t_table;
 
+/*
+**		PARSING.C
+*/
 t_args			*parsing(int ac, char **av);
+/*
+**		UTILS.C
+*/
 int				ft_atoi(char *s);
 unsigned int	ft_strlen(char *s);
 void			ft_putnbr_fd(long n, int fd);
-void	print_state(t_table *philo, int id, int state);
-long		timestamp(void);
-void	print_death(t_table *philo, long t_stamp);
-void		waiting(long time, long timestamp);
+/*
+**		MEAL.C
+*/
+void			*philo_meal(void *arg);
+/*
+**		PRINT.C
+*/
+void			print_state(t_table *philo, int id, int state);
+void			print_death(t_table *philo, long t_stamp);
+/*
+**		TIME.C
+*/
+void			waiting(long time, long timestamp);
+long			timestamp(void);
+/*
+**		INITIALIZATION.C
+*/
+void			copy_args(t_table *philo, t_args *args,
+	int count);
+void			*error_allocate(t_table **philo,
+	t_write *writing, t_fork *fork, int msg);
+int				init_mutex(t_table **philo, t_args *args,
+	t_fork *fork, t_gbl_var **g_mtx);
+void			*allocate_philosophers(t_table **philo, t_args *args);
+/*
+**		PHILOSOPHIZE.C
+*/
+void			*philosophize(void *arg);
+/*
+**		FORK.C
+*/
+void			take_fork(t_table *philo, int id, int other_hand);
+void			free_fork(t_table *philo, int id, int other_hand);
 
 #endif
