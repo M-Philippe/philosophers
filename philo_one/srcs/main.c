@@ -33,13 +33,15 @@ void			copy_args(t_table *philo, t_args *args,
 		philo->turns = -1;
 }
 
-void		*error_allocate(t_table **philo, t_write *writing, t_fork *fork, int msg)
+void		*error_allocate(t_table **philo,
+	t_write *writing, t_fork *fork, int msg)
 {
 	(writing) ? (free(writing)) : 0;
 	(fork) ? (free(fork)) : 0;
 	(*philo) ? (free(*philo)) : 0;
 	if (msg == MALLOC_WRITE)
-		write(1, "Error in write malloc\n", ft_strlen("Error in write malloc\n"));
+		write(1, "Error in write malloc\n",
+			ft_strlen("Error in write malloc\n"));
 	else if (msg == MALLOC_PHILO)
 		write(1, "Error in philo fork\n", ft_strlen("Error in philo fork\n"));
 	else if (msg == MALLOC_FORK)
@@ -51,7 +53,8 @@ void		*error_allocate(t_table **philo, t_write *writing, t_fork *fork, int msg)
 	return (NULL);
 }
 
-int			init_mutex(t_table **philo, t_args *args, t_fork *fork, t_gbl_var **g_mtx)
+int			init_mutex(t_table **philo, t_args *args,
+	t_fork *fork, t_gbl_var **g_mtx)
 {
 	int			i;
 	int			ret;
@@ -122,7 +125,7 @@ void		take_fork(t_table *philo, int id, int other_hand)
 
 void		free_fork(t_table *philo, int id, int other_hand)
 {
-	if (philo->id == philo->nb_philo -1)
+	if (philo->id == philo->nb_philo - 1)
 	{
 		pthread_mutex_unlock(&philo->fork[id].fork);
 		pthread_mutex_unlock(&philo->fork[other_hand].fork);
@@ -165,11 +168,10 @@ void		*philo_meal(void *arg)
 			return (NULL);
 		}
 		pthread_mutex_unlock(&philo->meal);
-		usleep(1000);
 	}
 }
 
-void ft_usleep(long time, long timestamp)
+void		ft_usleep(long time, long timestamp)
 {
 	struct timeval tv;
 
@@ -252,7 +254,7 @@ int			start_philosophers(t_table *philo, t_args *args)
 	}
 	while (done < args->nb_philo)
 	{
-		usleep(100);
+		usleep(1000);
 		pthread_mutex_lock(&g_mtx->g_done);
 		done = g_philos_are_done;
 		pthread_mutex_unlock(&g_mtx->g_done);
