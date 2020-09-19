@@ -168,6 +168,7 @@ void		*philo_meal(void *arg)
 			return (NULL);
 		}
 		pthread_mutex_unlock(&philo->meal);
+		usleep(1000);
 	}
 }
 
