@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/20 23:17:37 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/21 14:08:25 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,9 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 
-// TO REMOVE
+/*
+**		TO REMOVE
+*/
 # include <string.h>
 
 # define FORK 0
@@ -36,6 +38,8 @@
 # define MALLOC_PHILO 2
 # define MALLOC_GBL 3
 # define ERROR_MUTEX 4
+
+# define MEAL_LEN 11
 
 int		g_someone_is_dead;
 int		g_philos_are_done;
@@ -52,26 +56,18 @@ typedef	struct	s_args
 
 typedef struct	s_write
 {
-	//pthread_mutex_t	writing;
-	//			SEM
 	char		*sem_name;
 	sem_t		*sem_write;
 }				t_write;
 
 typedef struct	s_fork
 {
-	pthread_mutex_t	fork;
-	//			SEM
 	char		*sem_name;
 	sem_t		*sem_forks;
 }				t_fork;
 
 typedef struct	s_gbl_var
 {
-	pthread_mutex_t		g_dead;
-	pthread_mutex_t		g_done;
-	pthread_mutex_t		g_meals;
-	//			SEM
 	char		*dead_name;
 	char		*done_name;
 	char		*meals_name;
@@ -97,7 +93,7 @@ typedef struct	s_table
 	int				turns;
 	int				stop_meal;
 	t_fork			*fork;
-	char			sem_name[10];
+	char			sem_name[MEAL_LEN];
 	sem_t			*sem_meal;
 }				t_table;
 
@@ -143,7 +139,7 @@ void			*philosophize(void *arg);
 /*
 **		FORK.C
 */
-void			take_fork(t_table *philo, int id, int other_hand);
-void			free_fork(t_table *philo, int id, int other_hand);
+void			take_fork(t_table *philo, int id);
+void			free_fork(t_table *philo);
 
 #endif

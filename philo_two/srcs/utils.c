@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:17:44 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/20 23:05:56 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/21 14:11:03 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int				ft_atoi(char *s)
 	return (nb == 0 ? -1 : nb);
 }
 
-char		*ft_strdup(char *s)
+char			*ft_strdup(char *s)
 {
 	char	*dst;
 	int		i;

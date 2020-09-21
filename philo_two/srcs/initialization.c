@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:37:39 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/20 23:37:40 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/21 14:06:52 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,34 +25,11 @@ static	int		nblen(int n)
 	return (i);
 }
 
-static char		*int_min(void)
-{
-	long int	nb;
-	char		*str;
-	int			i;
-
-	nb = 2147483648;
-	i = 11;
-	if (!(str = malloc(sizeof(char) * 12)))
-		return (NULL);
-	str[0] = '-';
-	str[i] = '\0';
-	i--;
-	while (i > 0)
-	{
-		str[i--] = 48 + (nb % 10);
-		nb = nb / 10;
-	}
-	return (str);
-}
-
 static	char	*neg_itoa(int n)
 {
 	char	*dst;
 	int		i;
 
-	if (n == -2147483648)
-		return (int_min());
 	n = n * -1;
 	i = nblen(n);
 	if (!(dst = malloc(sizeof(char) * (i + 2))))
@@ -128,6 +105,41 @@ void		*error_allocate(t_table **philo,
 	return (NULL);
 }
 
+char	*ft_strcat(char *dest, const char *src)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (dest[i] != '\0')
+	{
+		i++;
+	}
+	while (src[j] != '\0')
+	{
+		dest[i] = src[j];
+		i++;
+		j++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+
+
+void		meal_name(char *sem_name, int i)
+{
+	char *ita;
+
+	ita = NULL;
+	memset(sem_name, '\0', MEAL_LEN - 1);
+	ft_strcat(sem_name, "/meal ");
+	ita = ft_itoa(i);
+	ft_strcat(sem_name, ita);
+	free(ita);
+}
+
 int			init_semaphore(t_table **philo, t_args *args,
 	t_fork *fork, t_gbl_var **g_mtx)
 {
@@ -165,18 +177,18 @@ int			init_semaphore(t_table **philo, t_args *args,
 		(*philo)[i].fork = fork;
 		copy_args(&(*philo)[i], args, i);
 		(*philo)[i].write = (*philo)[0].write;
-		//ret += pthread_mutex_init(&(*philo)[i].meal, NULL);
-		// PUT FT_STRCAT
-		char *ita;
-		memset((*philo)[i].sem_name, '\0', 9);
-		strcat((*philo)[i].sem_name, "/meal ");
-		ita = ft_itoa(i);
-		strcat((*philo)[i].sem_name, ita);
-		free(ita);
-		(*philo)[i].sem_meal = sem_open((*philo)[0].sem_name, O_CREAT, S_IRUSR | S_IWUSR, 1);
+		meal_name((*philo)[i].sem_name, i);
+		(*philo)[i].sem_meal = sem_open((*philo)[i].sem_name, O_CREAT, S_IRUSR | S_IWUSR, 1);
+		sem_unlink((*philo)[i].sem_name);
 		(*philo)[i].g_mtx = (*g_mtx);
 		i++;
 	}
+	// UNLINK SEMAPHORE
+	sem_unlink((*philo)[0].g_mtx->dead_name);
+	sem_unlink((*philo)[0].g_mtx->done_name);
+	sem_unlink((*philo)[0].g_mtx->meals_name);
+	sem_unlink((*philo)[0].fork->sem_name);
+	sem_unlink((*philo)[0].write->sem_name);
 	return (ret);
 }
 

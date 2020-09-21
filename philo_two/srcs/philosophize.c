@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:46:21 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/20 22:48:42 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/21 13:55:49 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,20 @@ void		setup_hand_and_meal(t_table *philo)
 
 int			eat(t_table *philo, int *count)
 {
-	take_fork(philo, philo->id, philo->other_hand);
-	//pthread_mutex_lock(&philo->meal);
+	take_fork(philo, philo->id);
 	sem_wait(philo->sem_meal);
 	philo->last_meal = timestamp();
-	//pthread_mutex_unlock(&philo->meal);
 	sem_post(philo->sem_meal);
 	print_state(philo, philo->id, EATING);
 	waiting(philo->time_to_eat, timestamp());
-	free_fork(philo, philo->id, philo->other_hand);
+	free_fork(philo);
 	*count += 1;
-	//pthread_mutex_lock(&philo->g_mtx->g_dead);
 	sem_wait(philo->g_mtx->sem_dead);
 	if (g_someone_is_dead == 1)
 	{
-		//pthread_mutex_unlock(&philo->g_mtx->g_dead);
 		sem_post(philo->g_mtx->sem_dead);
 		return (1);
 	}
-	//pthread_mutex_unlock(&philo->g_mtx->g_dead);
 	sem_post(philo->g_mtx->sem_dead);
 	return (0);
 }
@@ -52,11 +47,9 @@ int			checking_turns(t_table *philo, int count)
 	if (count == philo->turns)
 	{
 		philo->stop_meal = 1;
-		//pthread_mutex_unlock(&philo->meal);
 		sem_post(philo->sem_meal);
 		return (1);
 	}
-	//pthread_mutex_unlock(&philo->meal);
 	sem_post(philo->sem_meal);
 	return (0);
 }
@@ -74,7 +67,6 @@ void		*philosophize(void *arg)
 	{
 		if (eat(philo, &count))
 			break ;
-		//pthread_mutex_lock(&philo->meal);
 		sem_wait(philo->sem_meal);
 		if (checking_turns(philo, count))
 			break ;
@@ -82,10 +74,8 @@ void		*philosophize(void *arg)
 		waiting(philo->time_to_sleep, timestamp());
 		print_state(philo, philo->id, THINKING);
 	}
-	//pthread_mutex_lock(&philo->g_mtx->g_done);
 	sem_wait(philo->g_mtx->sem_done);
 	g_philos_are_done++;
-	//pthread_mutex_unlock(&philo->g_mtx->g_done);
 	sem_post(philo->g_mtx->sem_done);
 	return (NULL);
 }
