@@ -6,12 +6,12 @@
 #    By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
-#    Updated: 2020/09/21 14:07:46 by pminne           ###   ########lyon.fr    #
+#    Updated: 2020/09/21 18:50:53 by pminne           ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 
-CFLAGS	= -Wall -Wextra -g3
+CFLAGS	= -Wall -Wextra -Werror
 
 NAME	=	philo_two
 
@@ -26,6 +26,8 @@ COMP	=	$(SRCS_D)main.c\
 			$(SRCS_D)meal.c\
 			$(SRCS_D)fork.c\
 			$(SRCS_D)philosophize.c\
+			$(SRCS_D)meal_name.c\
+			$(SRCS_D)error_semaphore.c\
 
 OBJ	=	$(COMP:.c=.o)
 

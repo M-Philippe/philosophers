@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 14:08:25 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/21 18:51:11 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,6 @@
 # include <semaphore.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-
-/*
-**		TO REMOVE
-*/
 # include <string.h>
 
 # define FORK 0
@@ -37,7 +33,7 @@
 # define MALLOC_FORK 1
 # define MALLOC_PHILO 2
 # define MALLOC_GBL 3
-# define ERROR_MUTEX 4
+# define ERROR_SEMAPHORE 4
 
 # define MEAL_LEN 11
 
@@ -130,7 +126,7 @@ void			copy_args(t_table *philo, t_args *args,
 void			*error_allocate(t_table **philo,
 	t_write *writing, t_fork *fork, int msg);
 int				init_semaphore(t_table **philo, t_args *args,
-	t_fork *fork, t_gbl_var **g_mtx);
+	t_gbl_var **g_mtx);
 void			*allocate_philosophers(t_table **philo, t_args *args);
 /*
 **		PHILOSOPHIZE.C
@@ -141,5 +137,17 @@ void			*philosophize(void *arg);
 */
 void			take_fork(t_table *philo, int id);
 void			free_fork(t_table *philo);
+/*
+**		MEAl_NAME.C
+*/
+void			meal_name(char *sem_name, int i);
+/*
+**		ERROR_SEMAPHORE.C
+*/
+void			unlink_semaphore(t_table *philo);
+void			*error_allocate(t_table **philo,
+	t_write *writing, t_fork *fork, int msg);
+int				free_error_semaphore(t_table *philo);
+int				error_semaphore(t_table *philo, int nb_philo);
 
 #endif
