@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:14 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 18:01:24 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/22 18:07:02 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void		start_philosophers(t_table *philo, t_args *args)
 {
 	int			i;
 	long		start_program;
+	pid_t		pid;
 	t_gbl_var	*g_mtx;
 
 	i = 0;
@@ -47,12 +48,13 @@ void		start_philosophers(t_table *philo, t_args *args)
 	while (i < args->nb_philo)
 	{
 		philo[i].start_program = start_program;
-		pthread_create(&philo[i].th, NULL, philosophize, &philo[i]);
-		(i == args->nb_philo - 1) ? (pthread_join(philo[i].th, NULL)) :
-			(pthread_detach(philo[i].th));
+		pid = fork();
+		if (pid == 0)
+			philosophize(&philo[i]);
 		usleep(50);
 		i++;
 	}
+	waitpid(pid, NULL, 0);
 	sem_wait(g_mtx->sem_done);
 	waiting_end_simulation(args, g_mtx);
 	write(1, "End of simulation\n", ft_strlen("End of simulation\n"));

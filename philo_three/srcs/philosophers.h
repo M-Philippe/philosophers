@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 18:51:11 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/22 18:07:37 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,10 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <string.h>
+
+# include <signal.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 
 # define FORK 0
 # define EATING 1
