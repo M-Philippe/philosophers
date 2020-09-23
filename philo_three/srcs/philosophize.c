@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:46:21 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 13:55:49 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/23 23:09:40 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,5 +77,5 @@ void		*philosophize(void *arg)
 	sem_wait(philo->g_mtx->sem_done);
 	g_philos_are_done++;
 	sem_post(philo->g_mtx->sem_done);
-	return (NULL);
+	exit(0);
 }
