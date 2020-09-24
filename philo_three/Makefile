@@ -6,12 +6,12 @@
 #    By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
-#    Updated: 2020/09/22 18:04:28 by pminne           ###   ########lyon.fr    #
+#    Updated: 2020/09/24 21:59:49 by pminne           ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -g3 #-fsanitize=address#-Werror
 
 NAME	=	philo_three
 

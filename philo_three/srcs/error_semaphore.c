@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:47:43 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 18:49:05 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 22:27:16 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 void		unlink_semaphore(t_table *philo)
 {
-	sem_unlink(philo->g_mtx->dead_name);
-	sem_unlink(philo->g_mtx->done_name);
-	sem_unlink(philo->g_mtx->meals_name);
-	sem_unlink(philo->fork->sem_name);
-	sem_unlink(philo->write->sem_name);
+	sem_unlink(DEAD_NAME);
+	sem_unlink(DONE_NAME);
+	sem_unlink(FORKS_NAME);
+	sem_unlink(WRITE_NAME);
 }
 
 void		*error_allocate(t_table **philo,
@@ -46,12 +45,6 @@ int			free_error_semaphore(t_table *philo)
 	char		*err_msg;
 
 	err_msg = NULL;
-	err_msg = ft_strdup("Error in semaphore initialization\n");
-	free(philo->fork->sem_name);
-	free(philo->write->sem_name);
-	free(philo->g_mtx->dead_name);
-	free(philo->g_mtx->done_name);
-	free(philo->g_mtx->meals_name);
 	free(philo->g_mtx);
 	write(1, err_msg, ft_strlen(err_msg));
 	free(err_msg);
@@ -64,15 +57,13 @@ int			error_semaphore(t_table *philo, int nb_philo)
 
 	(nb_philo == 0) ? (i = 1) :
 		(i = -1);
-	sem_unlink(philo->g_mtx->dead_name);
+	sem_unlink(DEAD_NAME);
 	sem_close(philo->g_mtx->sem_dead);
-	sem_unlink(philo->g_mtx->done_name);
+	sem_unlink(DONE_NAME);
 	sem_close(philo->g_mtx->sem_done);
-	sem_unlink(philo->g_mtx->meals_name);
-	sem_close(philo->g_mtx->sem_meals);
-	sem_unlink(philo->fork->sem_name);
+	sem_unlink(FORKS_NAME);
 	sem_close(philo->fork->sem_forks);
-	sem_unlink(philo->write->sem_name);
+	sem_unlink(WRITE_NAME);
 	sem_close(philo->write->sem_write);
 	while (i++ < nb_philo)
 	{

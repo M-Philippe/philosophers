@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:20 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 13:49:56 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 14:46:02 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,6 @@
 void	print_state(t_table *philo, int id, int state)
 {
 	sem_wait(philo->write->sem_write);
-	sem_wait(philo->g_mtx->sem_dead);
-	if (g_someone_is_dead == 1)
-	{
-		sem_post(philo->g_mtx->sem_dead);
-		sem_post(philo->write->sem_write);
-		return ;
-	}
-	sem_post(philo->g_mtx->sem_dead);
 	ft_putnbr_fd((timestamp() - philo->start_program), 1);
 	write(1, " ", 1);
 	ft_putnbr_fd(id + 1, 1);
@@ -44,5 +36,6 @@ void	print_death(t_table *philo, long t_stamp)
 	write(1, " ", 1);
 	ft_putnbr_fd(philo->id + 1, 1);
 	write(1, " is dead\n", 9);
-	sem_post(philo->write->sem_write);
+	sem_post(philo->g_mtx->sem_dead);
+	//sem_post(philo->write->sem_write);
 }

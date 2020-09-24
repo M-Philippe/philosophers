@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:37:39 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 18:48:48 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 22:26:48 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,24 +28,20 @@ void		copy_args(t_table *philo, t_args *args,
 int			init_gbl_semaphore(t_table **philo, t_args *args)
 {
 	if (((*philo)[0].write->sem_write =
-		sem_open((*philo)[0].write->sem_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
+		sem_open(WRITE_NAME, O_CREAT, S_IRUSR | S_IWUSR, 1))
 			== SEM_FAILED)
 		return (error_semaphore(&(*philo)[0], 0));
 	if (((*philo)[0].fork->sem_forks =
-		sem_open((*philo)[0].fork->sem_name, O_CREAT, S_IRUSR | S_IWUSR,
+		sem_open(FORKS_NAME, O_CREAT, S_IRUSR | S_IWUSR,
 			args->nb_philo))
 				== SEM_FAILED)
 		return (error_semaphore(&(*philo)[0], 0));
 	if (((*philo)[0].g_mtx->sem_dead =
-		sem_open((*philo)[0].g_mtx->dead_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
+		sem_open(DEAD_NAME, O_CREAT, S_IRUSR | S_IWUSR, args->nb_philo))
 			== SEM_FAILED)
 		return (error_semaphore(&(*philo)[0], 0));
 	if (((*philo)[0].g_mtx->sem_done =
-		sem_open((*philo)[0].g_mtx->done_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
-			== SEM_FAILED)
-		return (error_semaphore(&(*philo)[0], 0));
-	if (((*philo)[0].g_mtx->sem_meals =
-		sem_open((*philo)[0].g_mtx->meals_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
+		sem_open(DONE_NAME, O_CREAT, S_IRUSR | S_IWUSR, args->nb_philo))
 			== SEM_FAILED)
 		return (error_semaphore(&(*philo)[0], 0));
 	return (0);
@@ -67,11 +63,11 @@ int			init_philo_semaphore(t_table **philo, t_gbl_var **g_mtx,
 			sem_open((*philo)[i].sem_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
 				== SEM_FAILED)
 			return (error_semaphore(&(*philo)[0], i));
-		sem_unlink((*philo)[i].sem_name);
+		//sem_unlink((*philo)[i].sem_name);
 		(*philo)[i].g_mtx = (*g_mtx);
 		i++;
 	}
-	unlink_semaphore(&(*philo)[0]);
+	//unlink_semaphore(&(*philo)[0]);
 	return (0);
 }
 
@@ -85,12 +81,8 @@ int			init_semaphore(t_table **philo, t_args *args, t_gbl_var **g_mtx)
 		free(*g_mtx);
 		return (1);
 	}
-	(*g_mtx)->dead_name = ft_strdup("/dead");
 	(*g_mtx)->sem_dead = NULL;
-	(*g_mtx)->done_name = ft_strdup("/done");
 	(*g_mtx)->sem_done = NULL;
-	(*g_mtx)->meals_name = ft_strdup("/done");
-	(*g_mtx)->sem_meals = NULL;
 	(*philo)[0].g_mtx = *g_mtx;
 	if (init_gbl_semaphore(philo, args))
 		return (1);
@@ -118,8 +110,6 @@ void		*allocate_philosophers(t_table **philo, t_args *args)
 	(*philo)[0].write->sem_write = NULL;
 	(*philo)[0].fork = fork;
 	(*philo)[0].fork->sem_forks = NULL;
-	(*philo)[0].fork->sem_name = ft_strdup("/forks");
-	(*philo)[0].write->sem_name = ft_strdup("/write");
 	if (init_semaphore(philo, args, &g_mtx))
 		return (error_allocate(philo, write, fork, ERROR_SEMAPHORE));
 	return (*philo);

@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/22 18:07:37 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 22:25:28 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
+# include <errno.h>
+
 # define FORK 0
 # define EATING 1
 # define SLEEPING 2
@@ -39,11 +41,13 @@
 # define MALLOC_GBL 3
 # define ERROR_SEMAPHORE 4
 
-# define MEAL_LEN 11
+# define FORKS_NAME "/fork"
+# define WRITE_NAME "/write"
+# define DEAD_NAME "/dead"
+# define DONE_NAME "/done"
+# define INIT_NAME "/init"
 
-int		g_someone_is_dead;
-int		g_philos_are_done;
-int		g_meals_are_done;
+# define MEAL_LEN 11
 
 typedef	struct	s_args
 {
@@ -56,27 +60,21 @@ typedef	struct	s_args
 
 typedef struct	s_write
 {
-	char		*sem_name;
 	sem_t		*sem_write;
 }				t_write;
 
 typedef struct	s_fork
 {
-	char		*sem_name;
 	sem_t		*sem_forks;
 }				t_fork;
 
-typedef struct	s_gbl_var
+ typedef struct s_gbl_var
 {
-	char		*dead_name;
-	char		*done_name;
-	char		*meals_name;
-	sem_t		*sem_dead;
-	sem_t		*sem_done;
-	sem_t		*sem_meals;
+       sem_t           *sem_dead;
+       sem_t           *sem_done;
 }				t_gbl_var;
 
-typedef struct	s_table
+typedef struct s_table
 {
 	int				id;
 	t_write			*write;
@@ -95,7 +93,20 @@ typedef struct	s_table
 	t_fork			*fork;
 	char			sem_name[MEAL_LEN];
 	sem_t			*sem_meal;
+	//
+	sem_t			*sem_init;
 }				t_table;
+
+typedef struct	s_mtr
+{
+	t_table		*head_philo;
+	t_args		*args;
+	sem_t		*sem_dead;
+	sem_t		*sem_init;
+	sem_t		*sem_done;
+	pid_t		*pid;
+	//int			id;
+}				t_mtr;
 
 /*
 **		PARSING.C

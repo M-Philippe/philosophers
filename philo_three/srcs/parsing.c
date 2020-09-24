@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:11 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/19 12:49:02 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 21:15:55 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,6 @@ static void		*perror_parsing(char *msg_error, t_args *args)
 
 static t_args	*fifth_args(char *av, t_args *args)
 {
-	g_someone_is_dead = 0;
-	g_philos_are_done = 0;
-	g_meals_are_done = 0;
 	args->n_time_must_eat = ft_atoi(av);
 	if (args->n_time_must_eat == -1)
 		return (perror_parsing("Time_eat must be positive (zero out)\n", args));

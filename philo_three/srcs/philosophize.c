@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:46:21 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/23 23:09:40 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/24 22:32:33 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,6 @@ int			eat(t_table *philo, int *count)
 	waiting(philo->time_to_eat, timestamp());
 	free_fork(philo);
 	*count += 1;
-	sem_wait(philo->g_mtx->sem_dead);
-	if (g_someone_is_dead == 1)
-	{
-		sem_post(philo->g_mtx->sem_dead);
-		return (1);
-	}
-	sem_post(philo->g_mtx->sem_dead);
 	return (0);
 }
 
@@ -54,14 +47,40 @@ int			checking_turns(t_table *philo, int count)
 	return (0);
 }
 
+void		re_open_semaphore(t_table *philo)
+{
+	if (philo->id == philo->nb_philo - 1)
+	{
+		if ((philo->sem_init = sem_open(INIT_NAME, 0)) == SEM_FAILED)
+			exit(0);
+		sem_wait(philo->sem_init);
+	}
+	if ((philo->g_mtx->sem_done = sem_open(DONE_NAME, 0)) == SEM_FAILED)
+		exit(0);
+	if ((philo->g_mtx->sem_dead = sem_open(DEAD_NAME, 0)) == SEM_FAILED)
+		exit(0);
+	if ((philo->fork->sem_forks = sem_open(FORKS_NAME, 0)) == SEM_FAILED)
+		exit(0);
+	if ((philo->write->sem_write = sem_open(WRITE_NAME, 0)) == SEM_FAILED)
+		exit(0);
+	if ((philo->sem_meal = sem_open(philo->sem_name, 0)) == SEM_FAILED)
+		exit(0);
+	sem_unlink(philo->sem_name);
+}
+
 void		*philosophize(void *arg)
 {
 	t_table		*philo;
 	int			count;
 
 	philo = arg;
+	re_open_semaphore(philo);
 	count = 0;
 	philo->stop_meal = 0;
+	sem_wait(philo->g_mtx->sem_dead);
+	sem_wait(philo->g_mtx->sem_done);
+	if (philo->id == philo->nb_philo - 1)
+		sem_post(philo->sem_init);
 	setup_hand_and_meal(philo);
 	while (1)
 	{
@@ -74,8 +93,6 @@ void		*philosophize(void *arg)
 		waiting(philo->time_to_sleep, timestamp());
 		print_state(philo, philo->id, THINKING);
 	}
-	sem_wait(philo->g_mtx->sem_done);
-	g_philos_are_done++;
 	sem_post(philo->g_mtx->sem_done);
 	exit(0);
 }
