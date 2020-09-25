@@ -6,18 +6,19 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/21 18:47:43 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/24 22:27:16 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/25 18:32:43 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void		unlink_semaphore(t_table *philo)
+void		unlink_semaphore(void)
 {
 	sem_unlink(DEAD_NAME);
 	sem_unlink(DONE_NAME);
 	sem_unlink(FORKS_NAME);
 	sem_unlink(WRITE_NAME);
+	sem_unlink(INIT_NAME);
 }
 
 void		*error_allocate(t_table **philo,

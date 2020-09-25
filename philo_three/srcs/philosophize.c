@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:46:21 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/24 22:32:33 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/25 20:22:00 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void		re_open_semaphore(t_table *philo)
 	sem_unlink(philo->sem_name);
 }
 
-void		*philosophize(void *arg)
+void		philosophize(void *arg)
 {
 	t_table		*philo;
 	int			count;
@@ -93,6 +93,6 @@ void		*philosophize(void *arg)
 		waiting(philo->time_to_sleep, timestamp());
 		print_state(philo, philo->id, THINKING);
 	}
-	sem_post(philo->g_mtx->sem_done);
-	exit(0);
+	sem_wait(philo->sem_meal);
+	exit_philosophize(philo);
 }

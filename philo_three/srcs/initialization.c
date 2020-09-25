@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/19 13:37:39 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/24 22:26:48 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/25 20:24:59 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,9 @@ int			init_philo_semaphore(t_table **philo, t_gbl_var **g_mtx,
 			sem_open((*philo)[i].sem_name, O_CREAT, S_IRUSR | S_IWUSR, 1))
 				== SEM_FAILED)
 			return (error_semaphore(&(*philo)[0], i));
-		//sem_unlink((*philo)[i].sem_name);
 		(*philo)[i].g_mtx = (*g_mtx);
 		i++;
 	}
-	//unlink_semaphore(&(*philo)[0]);
 	return (0);
 }
 

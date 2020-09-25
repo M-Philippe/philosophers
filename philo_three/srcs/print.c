@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:20 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/24 14:46:02 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/25 17:03:45 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,4 @@ void	print_death(t_table *philo, long t_stamp)
 	ft_putnbr_fd(philo->id + 1, 1);
 	write(1, " is dead\n", 9);
 	sem_post(philo->g_mtx->sem_dead);
-	//sem_post(philo->write->sem_write);
 }

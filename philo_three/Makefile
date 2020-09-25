@@ -6,12 +6,12 @@
 #    By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/23 02:26:02 by pminne            #+#    #+#              #
-#    Updated: 2020/09/24 21:59:49 by pminne           ###   ########lyon.fr    #
+#    Updated: 2020/09/25 20:31:11 by pminne           ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
 
-CFLAGS	= -Wall -Wextra -g3 #-fsanitize=address#-Werror
+CFLAGS	= -Wall -Wextra -Werror
 
 NAME	=	philo_three
 
@@ -28,6 +28,8 @@ COMP	=	$(SRCS_D)main.c\
 			$(SRCS_D)philosophize.c\
 			$(SRCS_D)meal_name.c\
 			$(SRCS_D)error_semaphore.c\
+			$(SRCS_D)exit.c\
+			$(SRCS_D)monitor.c\
 
 OBJ	=	$(COMP:.c=.o)
 

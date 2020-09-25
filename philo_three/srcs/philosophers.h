@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/24 22:25:28 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/25 20:30:56 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,13 @@
 # include <stdlib.h>
 # include <sys/time.h>
 # include <unistd.h>
-
 # include <semaphore.h>
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <string.h>
-
 # include <signal.h>
 # include <sys/types.h>
 # include <sys/wait.h>
-
-# include <errno.h>
 
 # define FORK 0
 # define EATING 1
@@ -68,13 +64,13 @@ typedef struct	s_fork
 	sem_t		*sem_forks;
 }				t_fork;
 
- typedef struct s_gbl_var
+typedef struct	s_gbl_var
 {
-       sem_t           *sem_dead;
-       sem_t           *sem_done;
+	sem_t		*sem_dead;
+	sem_t		*sem_done;
 }				t_gbl_var;
 
-typedef struct s_table
+typedef struct	s_table
 {
 	int				id;
 	t_write			*write;
@@ -93,19 +89,18 @@ typedef struct s_table
 	t_fork			*fork;
 	char			sem_name[MEAL_LEN];
 	sem_t			*sem_meal;
-	//
 	sem_t			*sem_init;
 }				t_table;
 
 typedef struct	s_mtr
 {
-	t_table		*head_philo;
-	t_args		*args;
-	sem_t		*sem_dead;
-	sem_t		*sem_init;
-	sem_t		*sem_done;
-	pid_t		*pid;
-	//int			id;
+	t_table			*head_philo;
+	t_args			*args;
+	sem_t			*sem_dead;
+	sem_t			*sem_init;
+	sem_t			*sem_done;
+	pid_t			*pid;
+	struct s_mtr	*other_mtr;
 }				t_mtr;
 
 /*
@@ -146,7 +141,7 @@ void			*allocate_philosophers(t_table **philo, t_args *args);
 /*
 **		PHILOSOPHIZE.C
 */
-void			*philosophize(void *arg);
+void			philosophize(void *arg);
 /*
 **		FORK.C
 */
@@ -159,10 +154,25 @@ void			meal_name(char *sem_name, int i);
 /*
 **		ERROR_SEMAPHORE.C
 */
-void			unlink_semaphore(t_table *philo);
+void			unlink_semaphore();
 void			*error_allocate(t_table **philo,
 	t_write *writing, t_fork *fork, int msg);
 int				free_error_semaphore(t_table *philo);
 int				error_semaphore(t_table *philo, int nb_philo);
+/*
+**		MONITOR.C
+*/
+void			*waiting_done(void *arg);
+void			*waiting_death(void *arg);
+void			launching_monitors(t_mtr *mtr);
+t_mtr			*setup_monitor(t_table *philo, t_args *args, t_gbl_var *g_mtx,
+	pid_t *pid);
+/*
+**		EXIT.c
+*/
+void			exit_philosophize(t_table *philo);
+void			clean_free(t_table *philo, t_args *args);
+void			destroy_semaphore(t_table *philo, t_args *args, t_fork *fork);
+void			unlink_philo_semaphore(t_table *philo);
 
 #endif
