@@ -34,8 +34,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	clang -lpthread $(CFLAGS) -o $(NAME) $(OBJ)
 
-%.o: %.c
-	clang $(CFLAGS) -I$(SRCS_D) -o $@ -c $<
+%.o: %.c $(SRCS_D)philosophers.h
+	clang $(CFLAGS) -o $@ -c $<
 
 clean:
 	rm -rf $(OBJ)
