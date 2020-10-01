@@ -6,20 +6,11 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:11 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/19 12:49:02 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/09/29 19:43:29 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-void			print_value(t_args *philo)
-{
-	printf("numbers of philo : %d\n", philo->nb_philo);
-	printf("time_to_die : %d\n", philo->time_to_starve);
-	printf("time to eat : %d\n", philo->time_to_eat);
-	printf("time to sleep : %d\n", philo->time_to_sleep);
-	printf("numbers of time must eat : %d\n", philo->n_time_must_eat);
-}
 
 static void		*perror_parsing(char *msg_error, t_args *args)
 {

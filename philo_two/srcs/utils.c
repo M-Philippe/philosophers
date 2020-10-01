@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:17:44 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 14:11:03 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/10/01 17:32:55 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,11 @@ static int		ft_is_number(char *s)
 	return (0);
 }
 
-int				ft_atoi(char *s)
+long			ft_atoi(char *s)
 {
-	int	neg;
-	int	nb;
-	int	i;
+	int		neg;
+	long	nb;
+	int		i;
 
 	nb = 0;
 	neg = 1;
@@ -75,7 +75,7 @@ int				ft_atoi(char *s)
 			neg *= -1;
 		i++;
 	}
-	if (neg == -1)
+	if (neg == -1 || ft_strlen(&s[i]) >= 10)
 		return (-1);
 	if (ft_is_number(&s[i]))
 		return (-1);
@@ -84,7 +84,7 @@ int				ft_atoi(char *s)
 		nb = (nb * 10) + s[i] - 48;
 		i++;
 	}
-	return (nb == 0 ? -1 : nb);
+	return (nb <= 0 ? -1 : nb);
 }
 
 char			*ft_strdup(char *s)

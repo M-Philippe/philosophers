@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:17 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/21 18:51:11 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/10/01 17:33:50 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,9 @@ typedef struct	s_table
 	pthread_t		th;
 	pthread_t		th_meal;
 	long			start_program;
-	int				time_to_eat;
-	int				time_to_sleep;
-	int				time_to_starve;
+	long			time_to_eat;
+	long			time_to_sleep;
+	long			time_to_starve;
 	long			last_meal;
 	int				nb_philo;
 	int				other_hand;
@@ -100,7 +100,7 @@ t_args			*parsing(int ac, char **av);
 /*
 **		UTILS.C
 */
-int				ft_atoi(char *s);
+long			ft_atoi(char *s);
 unsigned int	ft_strlen(char *s);
 void			ft_putnbr_fd(long n, int fd);
 char			*ft_strdup(char *s);

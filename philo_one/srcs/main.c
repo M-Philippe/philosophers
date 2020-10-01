@@ -6,7 +6,7 @@
 /*   By: pminne <pminne@student.42lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/07 17:15:14 by pminne            #+#    #+#             */
-/*   Updated: 2020/09/19 13:51:14 by pminne           ###   ########lyon.fr   */
+/*   Updated: 2020/10/01 17:34:09 by pminne           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void		start_philosophers(t_table *philo, t_args *args)
 		pthread_create(&philo[i].th, NULL, philosophize, &philo[i]);
 		(i == args->nb_philo - 1) ? (pthread_join(philo[i].th, NULL)) :
 			(pthread_detach(philo[i].th));
+		usleep(50);
 		i++;
 	}
 	pthread_mutex_lock(&g_mtx->g_done);
